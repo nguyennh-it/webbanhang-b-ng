@@ -2,7 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+                                //đại diện cho chi tiết từng sản phẩm trong đơn hàng.
 @Entity
 @Table(name = "order_details")
 @Data

@@ -20,7 +20,7 @@ public class Product {
     String id;
 
     String name;
-    String description;
+    String description;         //mô tả
     double price;
     int stock;
     String category;

@@ -2,7 +2,7 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+//Đại diện cho một sản phẩm trong giỏ hàng của người dùng.
 @Entity
 @Data
 @Builder
@@ -13,13 +13,13 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @ManyToOne
+    @ManyToOne                      //một dòng hàng có nhiều trong giỏ
     Product product;
 
     int quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne                          //một user có thể có nhiều hàng
+    @JoinColumn(name = "user_id")               // biết giỏ hàng này là của ai
     User user;
     @ManyToOne
     private ProductSize productSize;

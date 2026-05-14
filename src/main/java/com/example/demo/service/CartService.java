@@ -24,7 +24,7 @@ public class CartService {
             String username
     ) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)             //tìm trong giỏ hàng
                 .orElseThrow(() ->
                         new RuntimeException("Không tìm thấy người dùng"));
 
@@ -74,45 +74,29 @@ public class CartService {
 
     @org.springframework.transaction.annotation.Transactional
     public void checkout(String username) {
-        // 1. Tìm thằng User đang đăng nhập và lấy giỏ hàng của nó
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
-
         List<CartItem> cartItems = cartItemRepository.findByUserUsername(username);
-
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Giỏ hàng đang trống, không thể thanh toán!");
         }
-
-        // 2. Tạo hóa đơn mới (Order)
-        // Lưu ý: Dùng đường dẫn đầy đủ nếu IntelliJ vẫn báo đỏ class Order
         com.example.demo.entity.Order order = new com.example.demo.entity.Order();
-        order.setId(java.util.UUID.randomUUID().toString()); // Tạo ID ngẫu nhiên vì ID là String
+        order.setId(java.util.UUID.randomUUID().toString()); // Tạo ID ngẫu nhiên vì ID là String dam bảo k trung mã
         order.setUser(user);
         order.setStatus("PENDING");
         order.setCreated_at(new java.sql.Timestamp(System.currentTimeMillis()));
-
-        // Tính tổng tiền đơn hàng
         double total = cartItems.stream()
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum();
         order.setTotal_price(total);
-
-        // Lưu Order xuống database trước để lấy làm khóa ngoại cho OrderDetail
         orderRepository.save(order);
-
-        // 3. Chuyển từng món từ Giỏ hàng sang Chi tiết hóa đơn (OrderDetail)
-        // 3. Chuyển từng món từ Giỏ hàng sang OrderDetail
         for (CartItem item : cartItems) {
-
             ProductSize size = item.getProductSize();
-
             if (size.getStock() < item.getQuantity()) {
                 throw new RuntimeException(
                         "Size " + size.getSize() + " không đủ hàng"
                 );
             }
-
             size.setStock(size.getStock() - item.getQuantity());
             productSizeRepository.save(size);
 
@@ -122,10 +106,8 @@ public class CartService {
             detail.setProductSize(size);
             detail.setQuantity(item.getQuantity());
             detail.setPrice(item.getProduct().getPrice());
-
             orderDetailRepository.save(detail);
         }
-
 // 🔥 QUAN TRỌNG NHẤT: xóa giỏ hàng
         cartItemRepository.deleteByUserUsername(username);
     }

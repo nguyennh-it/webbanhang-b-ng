@@ -3,7 +3,7 @@ package com.example.demo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
-
+                                    //đại diện cho một đơn hàng tổng thể của người dùng.
 @Entity
 @Table(name = "orders")
 @Data
@@ -12,13 +12,13 @@ import java.sql.Timestamp;
 @Builder
 public class Order {
     @Id
-    private String id; // varchar(255) trong sơ đồ DB của mày
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private double total_price; // Ghi đúng như sơ đồ image_f16b76.jpg
+    private double total_price;
     private String status;
     private String address;
     private Timestamp created_at;

@@ -9,13 +9,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+                                                    //Giỏ Hàng
 @Controller
 @RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
-
     @GetMapping({"","/", "/view"})
     public String viewCart(Model model, Authentication auth) {
 
