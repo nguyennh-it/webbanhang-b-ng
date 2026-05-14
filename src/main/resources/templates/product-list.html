@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cửa Hàng Đồ Thể Thao</title>
+    <th:block th:replace="~{layout :: header-css}"></th:block>
+    <style>
+        /* Đảm bảo Card có độ cao bằng nhau và hiệu ứng đổ bóng */
+        .product-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        /* Khống chế ảnh luôn đều tăm tắp */
+        .card-img-top {
+            height: 250px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div th:replace="~{layout :: navbar}"></div>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-5 fw-bold">👟 Danh Mục Sản Phẩm ⚽</h1>
+
+    <div th:if="${#lists.isEmpty(products)}" class="text-center my-5">
+        <div class="p-5 bg-white rounded shadow-sm">
+            <p class="h4 text-muted">Hiện tại chưa có sản phẩm nào trong cửa hàng.</p>
+            <a th:href="@{/store/products}" class="btn btn-primary mt-3">Tải lại trang</a>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" th:each="p : ${products}">
+            <div class="card h-100 shadow-sm product-card">
+                <img th:src="${p.imageUrl != null and !#strings.isEmpty(p.imageUrl)} ? ${p.imageUrl} : 'https://placehold.co/300x200?text=Sport+Store'"
+                     class="card-img-top" alt="Ảnh sản phẩm"
+                     onerror="this.src='https://placehold.co/300x200?text=No+Image'">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold text-dark" th:text="${p.name}">Tên sản phẩm</h5>
+                    <p class="card-text text-muted small flex-grow-1"
+                       th:text="${p.description != null ? p.description : 'Sản phẩm chất lượng cao dành cho vận động viên.'}">
+                        Mô tả sản phẩm
+                    </p>
+
+                    <div class="mt-3">
+                        <p class="h4 text-danger fw-bold mb-3"
+                           th:text="${p.price != null} ? ${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'Liên hệ'">
+                            0 VNĐ
+                        </p>
+
+                        <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post" class="mb-2">
+
+                            <select name="sizeId" class="form-select mb-2">
+
+                                <option disabled selected>
+                                    Chọn size
+                                </option>
+
+                                <option th:each="s : ${p.sizes}"
+                                        th:value="${s.id}"
+                                        th:text="${s.size + ' - Còn ' + s.stock}">
+                                </option>
+
+                            </select>
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 fw-bold py-2 shadow-sm">
+
+                                Thêm vào giỏ 🛒
+
+                            </button>
+                        </form>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/store/edit/{id}(id=${p.id})}"
+                               class="btn btn-outline-warning btn-sm flex-grow-1">Sửa</a>
+                            <a th:href="@{/store/delete/{id}(id=${p.id})}"
+                               class="btn btn-outline-danger btn-sm flex-grow-1"
+                               onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">Xóa</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5">
+        <nav>
+            <ul class="pagination shadow-sm">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/store/products(page=${currentPage - 1}, keyword=${keyword})}">Trước</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link" th:href="@{/store/products(page=${i}, keyword=${keyword})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/store/products(page=${currentPage + 1}, keyword=${keyword})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div th:replace="~{layout :: footer}"></div>
+
+</body>
+</html>

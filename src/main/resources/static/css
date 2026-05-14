@@ -1,0 +1,15 @@
+/* Class của Bootstrap dành cho ảnh đầu card */
+.card-img-top {
+    height: 350px;    /* Cố định chiều cao */
+    object-fit: cover; /* Giúp ảnh không bị méo, tự động cắt trung tâm */
+    width: 100%;       /* Đảm bảo ảnh rộng hết khung */
+}
+
+/* Giúp các khung card luôn cao bằng nhau dù tên sản phẩm dài ngắn khác nhau */
+
+.card {
+    height: 100%;
+}
+.row {
+    gap: 20px; /* tăng khoảng cách */
+}
