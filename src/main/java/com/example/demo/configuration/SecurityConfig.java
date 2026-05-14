@@ -40,9 +40,8 @@ public class SecurityConfig {
                         // 1. Cho phép truy cập công khai: Login, CSS, JS và Hình ảnh
                         .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 
-                        // 2. Cho phép xem sản phẩm và THỰC HIỆN thao tác giỏ hàng (Thêm/Xem) không cần Login
-                        // Việc thêm "/cart/**" vào permitAll giúp nút "Thêm vào giỏ" hoạt động tự do
-                        .requestMatchers("/store/products", "/cart/**").permitAll()
+                        // 2. Cho phép xem sản phẩm và giỏ hàng không cần Login
+                        .requestMatchers("/store/products", "/cart", "/cart/").permitAll()
 
                         // 3. Chỉ Admin mới có quyền can thiệp vào kho hàng
                         .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**").hasRole("ADMIN")

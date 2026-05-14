@@ -19,9 +19,12 @@ public class CartController {
     @GetMapping({"","/", "/view"})
     public String viewCart(Model model, Authentication auth) {
 
-        if (auth == null) return "redirect:/login";
-
-        List<CartItem> cartItems = cartService.getCartItems(auth.getName());
+        List<CartItem> cartItems;
+        if (auth != null) {
+            cartItems = cartService.getCartItems(auth.getName());
+        } else {
+            cartItems = java.util.Collections.emptyList(); // Giỏ trống nếu chưa login
+        }
 
         // Tính tổng tiền của cả giỏ hàng
         double total = cartItems.stream()
@@ -30,6 +33,7 @@ public class CartController {
 
         model.addAttribute("items", cartItems); // Đặt tên là "items"
         model.addAttribute("totalPrice", total); // Gửi tổng tiền sang HTML
+        model.addAttribute("isLoggedIn", auth != null); // Flag để template biết có login không
         return "cart";
     }
 

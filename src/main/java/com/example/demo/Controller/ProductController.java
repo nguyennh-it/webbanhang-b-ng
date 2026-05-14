@@ -18,17 +18,14 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     ProductService productService;
 
-    @PostMapping("/add") // Nên thêm path cụ thể cho form
+    @PostMapping("/add")
     public String createProduct(@ModelAttribute @Valid ProductRequest request) {
-        // Dùng @ModelAttribute thay vì @RequestBody để nhận dữ liệu từ Form
+
         productService.createProduct(request);
 
-        // Trả về "redirect" để trình duyệt tự chuyển hướng về trang danh sách, 
-        // tránh hiện ra màn hình JSON đen như hình image_3959d7.png
         return "redirect:/store/products";
     }
 
-    // Các hàm trả về JSON cho API vẫn có thể giữ lại nhưng cần thêm @ResponseBody
     @GetMapping("/{id}")
     @ResponseBody
     public ApiResponse<ProductResponse> getProduct(@PathVariable String id){

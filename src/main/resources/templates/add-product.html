@@ -38,6 +38,26 @@
                 <label class="form-label">Link ảnh:</label>
                 <input type="text" th:field="*{imageUrl}" class="form-control" placeholder="https://...">
             </div>
+            <div class="mb-3">
+                <label class="form-label">Kích cỡ có sẵn:</label>
+                <div class="form-check">
+                    <!-- Sử dụng th:field="*{sizes}" để tự động bind vào List trong ProductRequest -->
+                    <input class="form-check-input" type="checkbox" th:field="*{sizes}" value="S" id="sizeS">
+                    <label class="form-check-label" for="sizeS">S (Nhỏ)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" th:field="*{sizes}" value="M" id="sizeM">
+                    <label class="form-check-label" for="sizeM">M (Vừa)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" th:field="*{sizes}" value="L" id="sizeL">
+                    <label class="form-check-label" for="sizeL">L (Lớn)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" th:field="*{sizes}" value="XL" id="sizeXL">
+                    <label class="form-check-label" for="sizeXL">XL (Rất lớn)</label>
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-success w-100">Lưu Sản Phẩm</button>
             <a href="/store/products" class="btn btn-secondary w-100 mt-2">Quay lại danh sách</a>
