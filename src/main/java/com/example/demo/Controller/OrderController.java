@@ -1,0 +1,21 @@
+package com.example.demo.Controller;
+
+import com.example.demo.entity.OrderStatus;
+import com.example.demo.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/orders")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @PostMapping("/{id}/status")
+    public String updateOrderStatus(@PathVariable String id, @RequestParam String newStatus) {
+        orderService.updateStatus(id, OrderStatus.valueOf(newStatus), "admin");
+        return "redirect:/orders";
+    }
+}

@@ -19,7 +19,8 @@ public class Order {
     private User user;
 
     private double total_price;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
     private String address;
     private Timestamp created_at;
 }
