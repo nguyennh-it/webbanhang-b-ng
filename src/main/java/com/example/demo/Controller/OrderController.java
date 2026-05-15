@@ -4,6 +4,7 @@ import com.example.demo.entity.OrderStatus;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -14,8 +15,23 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/{id}/status")
-    public String updateOrderStatus(@PathVariable String id, @RequestParam String newStatus) {
-        orderService.updateStatus(id, OrderStatus.valueOf(newStatus), "admin");
+    public String updateOrderStatus(@PathVariable String id,
+                                    @RequestParam String newStatus) {
+
+        orderService.updateStatus(
+                id,
+                OrderStatus.valueOf(newStatus.trim().toUpperCase()),
+                "admin"
+        );
+
         return "redirect:/orders";
     }
+    @GetMapping
+    public String viewOrders(Model model) {
+        System.out.println("🔥 ORDER CONTROLLER IS CALLED");
+        model.addAttribute("orders", orderService.getAllOrders());
+
+        return "orders";
+    }
+
 }

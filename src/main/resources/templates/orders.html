@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/layout :: header-css">
+    <title>Danh sách đơn hàng</title>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div th:replace="fragments/layout :: navbar"></div>
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 fw-bold">📦 Danh sách đơn hàng</h2>
+
+    <table class="table table-bordered table-striped shadow-sm">
+
+        <thead class="table-dark">
+        <tr>
+            <th>Mã đơn</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="order : ${orders}">
+
+            <td th:text="${order.id}"></td>
+
+            <td>
+                <span class="badge bg-primary"
+                      th:text="${order.status.name()}">
+                </span>
+            </td>
+
+            <td>
+
+                <form th:action="@{'/orders/' + ${order.id} + '/status'}"
+                      method="post"
+                      class="d-flex gap-2">
+
+                    <select name="newStatus"
+                            class="form-select form-select-sm w-auto">
+
+                        <option value="PENDING">PENDING</option>
+                        <option value="PAID">PAID</option>
+                        <option value="SHIPPED">SHIPPED</option>
+                        <option value="COMPLETED">COMPLETED</option>
+                        <option value="CANCELLED">CANCELLED</option>
+
+                    </select>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-sm">
+                        Cập nhật
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/layout :: footer"></div>
+
+</body>
+</html>

@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -34,5 +35,7 @@ public class OrderService {
              .build();
      orderStatusHistoryRepository.save(history);
     }
-
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
 }

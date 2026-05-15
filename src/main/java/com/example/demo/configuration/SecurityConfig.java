@@ -37,16 +37,27 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Cho phép truy cập công khai: Login, CSS, JS và Hình ảnh
-                        .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 
-                        // 2. Cho phép xem sản phẩm và giỏ hàng không cần Login
+                        // PUBLIC
+                        .requestMatchers(
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // STORE + CART PUBLIC
                         .requestMatchers("/store/products", "/cart", "/cart/").permitAll()
 
-                        // 3. Chỉ Admin mới có quyền can thiệp vào kho hàng
-                        .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**").hasRole("ADMIN")
+                        // ORDERS -> CHỈ ADMIN
+                        .requestMatchers("/orders/**").hasRole("ADMIN")
 
-                        // 4. Các yêu cầu khác phải xác thực
+                        // STORE ADMIN ACTIONS
+                        .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**")
+                        .hasRole("ADMIN")
+
+                        // CÒN LẠI PHẢI LOGIN
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
@@ -61,7 +72,6 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 )
-                // QUAN TRỌNG: Vô hiệu hóa CSRF để các request POST từ form "Thêm vào giỏ" không bị chặn 403
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(ex -> ex.accessDeniedPage("/403"));
 
