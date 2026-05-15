@@ -20,7 +20,7 @@ public class OrderController {
 
         System.out.println("🔥 ORDER CONTROLLER IS CALLED");
 
-        model.addAttribute("orders", orderService.getAllOrders());
+        model.addAttribute("orders", orderService.getAllOrders());  //gọi xuống servie lấy toàn bộ ds
 
         return "orders";
     }
