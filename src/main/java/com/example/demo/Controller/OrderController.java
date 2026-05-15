@@ -14,6 +14,18 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // HIỂN THỊ DANH SÁCH
+    @GetMapping
+    public String viewOrders(Model model) {
+
+        System.out.println("🔥 ORDER CONTROLLER IS CALLED");
+
+        model.addAttribute("orders", orderService.getAllOrders());
+
+        return "orders";
+    }
+
+    // UPDATE STATUS
     @PostMapping("/{id}/status")
     public String updateOrderStatus(@PathVariable String id,
                                     @RequestParam String newStatus) {
@@ -26,12 +38,4 @@ public class OrderController {
 
         return "redirect:/orders";
     }
-    @GetMapping
-    public String viewOrders(Model model) {
-        System.out.println("🔥 ORDER CONTROLLER IS CALLED");
-        model.addAttribute("orders", orderService.getAllOrders());
-
-        return "orders";
-    }
-
 }

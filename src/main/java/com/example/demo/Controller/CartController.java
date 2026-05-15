@@ -60,16 +60,19 @@ public class CartController {
         return "redirect:/cart";
     }
     @PostMapping("/checkout")
-    public String checkout(org.springframework.security.core.Authentication auth) {
+    public String checkout(Authentication auth) {
         if (auth == null) return "redirect:/login";
 
         try {
+                                                                // 1. Gọi service xử lý lưu đơn hàng và xóa giỏ rác cũ
             cartService.checkout(auth.getName());
-            // Thành công thì về trang shop, thêm báo hiệu ?success để hiện thông báo
-            return "redirect:/store/products?success=true";
+
+                                                                // 2. TỰ ĐỘNG CHUYỂN HƯỚNG: Thanh toán thành công, nhảy thẳng sang trang đơn hàng
+            return "redirect:/orders";
         } catch (Exception e) {
-            // Lỗi thì về giỏ hàng kèm tin nhắn lỗi
-            return "redirect:/cart?error=" + e.getMessage();
+            // Nếu có lỗi phát sinh (hết hàng, lỗi DB...), quay về giỏ kèm tin nhắn lỗi
+            return "redirect:/cart?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
         }
-    }
+                                                        }
+
 }

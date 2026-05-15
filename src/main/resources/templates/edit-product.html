@@ -2,12 +2,12 @@
 <head>
     <title>Sửa Thông Tin Sản Phẩm</title>
     <!-- 1. Nhúng CSS và Meta dùng chung -->
-    <th:block th:replace="~{layout :: header-css}"></th:block>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
 </head>
 <body class="bg-light">
 
 <!-- 2. Nhúng thanh Menu chung -->
-<div th:replace="~{layout :: navbar}"></div>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
 <div class="container mt-5">
     <!-- Căn giữa form với col-md-6 để giao diện cân đối -->
@@ -36,7 +36,7 @@
 </div>
 
 <!-- 3. Nhúng Chân trang chung -->
-<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: footer}"></div>
 
 </body>
 </html>

@@ -17,10 +17,12 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    private double total_price;
+    @Column(name = "total_price")
+    private double totalPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String address;
-    private Timestamp created_at;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt; // Đổi từ created_at thành createdAt
 }

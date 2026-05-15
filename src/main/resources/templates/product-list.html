@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Cửa Hàng Đồ Thể Thao</title>
-    <th:block th:replace="~{layout :: header-css}"></th:block>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
     <style>
         /* Đảm bảo Card có độ cao bằng nhau và hiệu ứng đổ bóng */
         .product-card {
@@ -24,7 +24,7 @@
 </head>
 <body class="bg-light">
 
-<div th:replace="~{layout :: navbar}"></div>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
 <div class="container mt-5">
     <h1 class="text-center mb-5 fw-bold">👟 Danh Mục Sản Phẩm ⚽</h1>
@@ -109,7 +109,7 @@
     </div>
 </div>
 
-<div th:replace="~{layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: footer}"></div>
 
 </body>
 </html>

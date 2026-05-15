@@ -83,12 +83,12 @@ public class CartService {
         com.example.demo.entity.Order order = new com.example.demo.entity.Order();
         order.setId(java.util.UUID.randomUUID().toString()); // Tạo ID ngẫu nhiên vì ID là String dam bảo k trung mã
         order.setUser(user);
-        order.setCreated_at(new java.sql.Timestamp(System.currentTimeMillis()));
+        order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
         order.setStatus(OrderStatus.PENDING);
         double total = cartItems.stream()
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum();
-        order.setTotal_price(total);
+        order.setTotalPrice(total);
         orderRepository.save(order);
         for (CartItem item : cartItems) {
             ProductSize size = item.getProductSize();
