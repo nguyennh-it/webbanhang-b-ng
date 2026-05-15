@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.UserRepository.OrderDetailRepository;
 import com.example.demo.UserRepository.OrderRepository;
 import com.example.demo.UserRepository.OrderStatusHistoryRepository;
 import com.example.demo.entity.Order;
+import com.example.demo.entity.OrderDetail;
 import com.example.demo.entity.OrderStatus;
 import com.example.demo.entity.OrderStatusHistory;
 import lombok.AccessLevel;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class OrderService {
     OrderRepository orderRepository;
     OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final OrderDetailRepository orderDetailRepository;
     public  void updateStatus(String orderId, OrderStatus newStatus,String changedBy){
         Order order=orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
      order.setStatus(newStatus);
@@ -37,5 +40,16 @@ public class OrderService {
     }
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+    // 1. Hàm lấy thông tin chung của đơn hàng theo ID
+    public Order getOrderById(String id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + id));
+    }
+
+    // 2. Hàm lấy danh sách chi tiết các sản phẩm (áo, size, số lượng...) thuộc đơn hàng
+// Chú ý: Đổi "OrderDetail" và "orderDetailRepository" thành đúng tên Entity Chi tiết đơn hàng của bạn
+    public List<OrderDetail> getOrderDetailsByOrderId(String orderId) {
+        return orderDetailRepository.findByOrderId(orderId);
     }
 }

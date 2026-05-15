@@ -38,4 +38,20 @@ public class OrderController {
 
         return "redirect:/orders";
     }
+    // XEM CHI TIẾT ĐƠN HÀNG (ÁO GÌ, SIZE GÌ, SỐ LƯỢNG...)
+    @GetMapping("/chi-tiet/{id}")
+    public String viewOrderDetail(@PathVariable String id, Model model) {
+
+        System.out.println("🔥 VIEW ORDER DETAIL IS CALLED FOR ID: " + id);
+
+        // 1. Lấy thông tin chung của đơn hàng (để hiện mã đơn, trạng thái...)
+        model.addAttribute("order", orderService.getOrderById(id));
+
+        // 2. Lấy danh sách các sản phẩm (chi tiết) nằm trong đơn hàng đó
+        // Bạn check xem trong OrderService của bạn tên hàm lấy chi tiết đơn hàng là gì nhé
+        // Ví dụ: getOrderDetailsByOrderId(id) hoặc getOrderItemsByOrderId(id)
+        model.addAttribute("orderDetails", orderService.getOrderDetailsByOrderId(id));
+
+        return "order-detail"; // Trả về trang giao diện order-detail.html
+    }
 }
