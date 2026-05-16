@@ -37,9 +37,15 @@
                     <tbody>
                     <tr th:each="detail, iterStat : ${orderDetails}">
                         <td class="text-center" th:text="${iterStat.count}">1</td>
+
                         <td>
-                            <span th:text="${detail.product.name}" class="fw-bold"></span>
+                            <a th:href="@{/products/{id}(id=${detail.product.id})}"
+                               th:text="${detail.product.name}"
+                               class="fw-bold text-primary text-decoration-none product-detail-link">
+                                Tên sản phẩm
+                            </a>
                         </td>
+
                         <td class="text-center fw-bold text-success" th:text="${detail.productSize != null ? detail.productSize.size : 'N/A'}">M</td>
                         <td class="text-center" th:text="${detail.quantity}">1</td>
                         <td class="text-end" th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">1,000 VNĐ</td>
@@ -54,6 +60,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    .product-detail-link:hover {
+        color: #0a58ca !important;
+        text-decoration: underline !important;
+    }
+</style>
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 </body>

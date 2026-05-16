@@ -22,7 +22,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String address;
-
+    private Timestamp updatedAt;
     @Column(name = "created_at")
     private Timestamp createdAt; // Đổi từ created_at thành createdAt
 }

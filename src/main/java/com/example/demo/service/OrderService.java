@@ -28,7 +28,8 @@ public class OrderService {
     public  void updateStatus(String orderId, OrderStatus newStatus,String changedBy){
         Order order=orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
      order.setStatus(newStatus);
-     orderRepository.save(order);
+        order.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        orderRepository.save(order);
      OrderStatusHistory history= OrderStatusHistory.builder()
              .id(UUID.randomUUID().toString())
              .order(order)
@@ -39,7 +40,8 @@ public class OrderService {
      orderStatusHistoryRepository.save(history);
     }
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAllByOrderByUpdatedAtDesc();
+
     }
     // 1. Hàm lấy thông tin chung của đơn hàng theo ID
     public Order getOrderById(String id) {
@@ -52,4 +54,5 @@ public class OrderService {
     public List<OrderDetail> getOrderDetailsByOrderId(String orderId) {
         return orderDetailRepository.findByOrderId(orderId);
     }
+
 }

@@ -7,16 +7,15 @@
 
 <body>
 
-<!-- Navbar -->
 <div th:replace="fragments/layout :: navbar"></div>
 
 <div class="container mt-4">
 
     <h2 class="mb-4 fw-bold">📦 Danh sách đơn hàng</h2>
 
-    <table class="table table-bordered table-striped shadow-sm">
+    <table class="table table-bordered table-striped shadow-sm align-middle">
 
-        <thead class="table-dark">
+        <thead class="table-dark text-center">
         <tr>
             <th>Mã đơn</th>
             <th>Trạng thái</th>
@@ -28,32 +27,26 @@
 
         <tr th:each="order : ${orders}">
 
-            <td class="align-middle">
-                <a th:href="@{'/orders/chi-tiet/' + ${order.id}}"
-                   th:text="${order.id}"
-                   class="fw-bold text-decoration-none text-primary">
-                </a>
+            <td class="text-muted small fw-bold">
+                <span th:text="${order.id}"></span>
+            </td>
+
+            <td class="text-center">
+                <span class="badge bg-primary text-uppercase" th:text="${order.status}"></span>
             </td>
 
             <td>
-                <span class="badge bg-primary" th:text="${order.status}"></span>
-            </td>
-
-            <td>
-
                 <form th:action="@{'/orders/' + ${order.id} + '/status'}"
                       method="post"
-                      class="d-flex gap-2">
+                      class="d-flex gap-2 align-items-center mb-0">
 
                     <select name="newStatus"
                             class="form-select form-select-sm w-auto">
-
-                        <option value="PENDING">PENDING</option>
-                        <option value="PAID">PAID</option>
-                        <option value="SHIPPED">SHIPPED</option>
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-
+                        <option value="PENDING" th:selected="${order.status == 'PENDING'}">PENDING</option>
+                        <option value="PAID" th:selected="${order.status == 'PAID'}">PAID</option>
+                        <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">SHIPPED</option>
+                        <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">COMPLETED</option>
+                        <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">CANCELLED</option>
                     </select>
 
                     <button type="submit"
@@ -61,6 +54,10 @@
                         Cập nhật
                     </button>
 
+                    <a th:href="@{'/orders/chi-tiet/' + ${order.id}}"
+                       class="btn btn-outline-info btn-sm fw-bold">
+                        Chi tiết
+                    </a>
                 </form>
 
             </td>
@@ -73,7 +70,6 @@
 
 </div>
 
-<!-- Footer -->
 <div th:replace="fragments/layout :: footer"></div>
 
 </body>
