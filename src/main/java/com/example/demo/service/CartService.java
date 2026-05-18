@@ -12,11 +12,13 @@ import java.util.List;
 public class CartService {
 
     private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductSizeRepository productSizeRepository;
+
 
     public void addToCart(
             String productId,
@@ -53,11 +55,15 @@ public class CartService {
 
         } else {
 
+            Cart cart = cartRepository.findByUser(user)
+                    .orElseGet(() -> cartRepository.save(Cart.builder().user(user).build()));
+
             CartItem newItem = CartItem.builder()
                     .user(user)
                     .product(product)
                     .productSize(productSize)
                     .quantity(1)
+                    .cart(cart)
                     .build();
 
             cartItemRepository.save(newItem);

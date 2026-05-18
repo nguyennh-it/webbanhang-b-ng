@@ -21,6 +21,12 @@ public class CartItem {
     @ManyToOne                          //một user có thể có nhiều hàng
     @JoinColumn(name = "user_id")               // biết giỏ hàng này là của ai
     User user;
+
+    // Quan hệ ngược: Cart -> CartItem (mappedBy = "cart")
+    @ManyToOne
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
+
     @ManyToOne
     private ProductSize productSize;
 }
