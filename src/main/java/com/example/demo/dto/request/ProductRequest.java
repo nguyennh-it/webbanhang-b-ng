@@ -20,6 +20,7 @@ public class ProductRequest {
     double price;
     int stock;
     String category;
+    Long categoryId;
     String imageUrl;
     private List<String> sizes;
 }

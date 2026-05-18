@@ -9,8 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product,String> {
+public interface ProductRepository extends JpaRepository<Product, String> {
     boolean existsByName(String name);
-    // Thêm tham số Pageable và đổi kiểu trả về thành Page
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Product> findByCategoryIdAndNameContainingIgnoreCase(Long categoryId, String keyword, Pageable pageable);
 }

@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
-
 import com.example.demo.dto.request.ProductRequest;
+import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -20,29 +20,31 @@ public class ProductViewController {
     ProductService productService;
 
     // Hiển thị danh sách sản phẩm
+    CategoryService categoryService;  // ← thêm dòng này dưới ProductService
+
     @GetMapping("/products")
     public String listProducts(
             Model model,
             @RequestParam(name = "keyword", required = false) String keyword,
-            @RequestParam(name = "page", defaultValue = "0") int page) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "categoryId", required = false) Long categoryId) {  // ← thêm categoryId
 
-        int pageSize = 6;  // Bạn muốn hiện bao nhiêu sản phẩm trên 1 trang thì sửa ở đây
-
-        // Gọi hàm getProducts mới trả về đối tượng Page
-        var pageData = productService.getProducts(page, pageSize, keyword);
+        int pageSize = 6;
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);  // ← thêm categoryId
         model.addAttribute("products", pageData.getContent());
-        // Đẩy dữ liệu ra giao diện
-        model.addAttribute("products", pageData.getContent()); // Danh sách sản phẩm của trang hiện tại
-        model.addAttribute("totalPages", pageData.getTotalPages()); // Tổng số trang (để vẽ nút 1,2,3)
-        model.addAttribute("currentPage", page); // Trang hiện tại (để tô màu nút đang chọn)
-        model.addAttribute("keyword", keyword); // Giữ lại từ khóa tìm kiếm trên thanh search
+        model.addAttribute("totalPages", pageData.getTotalPages());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategoryId", categoryId);  // ← thêm
+        model.addAttribute("categories", categoryService.getAllCategories());  // ← thêm
 
         return "product-list";
     }
     // Hiển thị form thêm sản phẩm
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("request", new ProductRequest()); // ← Thymeleaf cần object này
+        model.addAttribute("request", new ProductRequest());
+        model.addAttribute("categories", categoryService.getAllCategories());
         return "add-product";
     }
 

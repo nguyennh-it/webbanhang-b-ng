@@ -28,7 +28,18 @@
 
 <div class="container mt-5">
     <h1 class="text-center mb-5 fw-bold">👟 Danh Mục Sản Phẩm ⚽</h1>
-
+    <!-- Tab lọc danh mục -->
+    <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+        <a th:href="@{/store/products(page=0, keyword=${keyword})}"
+           th:class="${selectedCategoryId == null} ? 'btn btn-dark' : 'btn btn-outline-dark'">
+            Tất cả
+        </a>
+        <a th:each="cat : ${categories}"
+           th:href="@{/store/products(page=0, keyword=${keyword}, categoryId=${cat.id})}"
+           th:text="${cat.name}"
+           th:class="${selectedCategoryId == cat.id} ? 'btn btn-dark' : 'btn btn-outline-dark'">
+        </a>
+    </div>
     <div th:if="${#lists.isEmpty(products)}" class="text-center my-5">
         <div class="p-5 bg-white rounded shadow-sm">
             <p class="h4 text-muted">Hiện tại chưa có sản phẩm nào trong cửa hàng.</p>

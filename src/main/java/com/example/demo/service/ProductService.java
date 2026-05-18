@@ -78,17 +78,25 @@ public class ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
     }
     // Sửa lại để hỗ trợ phân trang và tìm kiếm gộp làm một
-    public Page<ProductResponse> getProducts(int page, int size, String keyword) {
+    public Page<ProductResponse> getProducts(int page, int size, String keyword, Long categoryId) {
         // 1. Tạo đối tượng Pageable (trang bắt đầu từ 0)
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Product> productPage;
 
         // 2. Logic: Nếu có từ khóa thì tìm theo tên + phân trang, không thì lấy hết + phân trang
-        if (keyword != null && !keyword.isEmpty()) {
-            productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        if (categoryId != null) {
+            if (keyword != null && !keyword.isEmpty()) {
+                productPage = productRepository.findByCategoryIdAndNameContainingIgnoreCase(categoryId, keyword, pageable);
+            } else {
+                productPage = productRepository.findByCategoryId(categoryId, pageable);
+            }
         } else {
-            productPage = productRepository.findAll(pageable);
+            if (keyword != null && !keyword.isEmpty()) {
+                productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+            } else {
+                productPage = productRepository.findAll(pageable);
+            }
         }
 
         // 3. Chuyển đổi từ Page<Entity> sang Page<ResponseDTO> bằng MapStruct
