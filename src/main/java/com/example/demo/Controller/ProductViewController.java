@@ -81,5 +81,10 @@ public class ProductViewController {
     }
 
     // Hiển thị danh sách sản phẩm (Có hỗ trợ tìm kiếm)
-
+    // Hiển thị chi tiết sản phẩm
+    @GetMapping("/products/{id}")
+    public String productDetail(@PathVariable String id, Model model) {
+        model.addAttribute("product", productService.getProduct(id));
+        return "product-detail";
+    }
 }

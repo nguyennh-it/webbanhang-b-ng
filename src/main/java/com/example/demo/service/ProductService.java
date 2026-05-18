@@ -54,6 +54,14 @@ public class ProductService {
     }
 
     public void deleteProduct(String id) {
+        // Xóa ProductSize trước để tránh fail do foreign key
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
+
+        if (product.getSizes() != null) {
+            product.getSizes().forEach(size -> productSizeRepository.delete(size));
+        }
+
         productRepository.deleteById(id);
     }
 

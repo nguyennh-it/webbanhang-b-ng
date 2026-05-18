@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="${product.name}">Chi tiết sản phẩm</title>
+  <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5">
+  <div class="row g-5">
+
+    <!-- Ảnh sản phẩm -->
+    <div class="col-md-6">
+      <img th:src="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}
+                         ? ${product.imageUrl}
+                         : 'https://placehold.co/600x400?text=No+Image'"
+           class="img-fluid rounded shadow"
+           onerror="this.src='https://placehold.co/600x400?text=No+Image'"
+           alt="Ảnh sản phẩm">
+    </div>
+
+    <!-- Thông tin sản phẩm -->
+    <div class="col-md-6">
+      <h2 class="fw-bold" th:text="${product.name}">Tên sản phẩm</h2>
+
+      <p class="text-muted mt-2"
+         th:text="${product.description != null ? product.description : 'Chưa có mô tả.'}">
+        Mô tả
+      </p>
+
+      <h3 class="text-danger fw-bold mt-3"
+          th:text="${product.price != null}
+                         ? ${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'
+                         : 'Liên hệ'">
+        0 VNĐ
+      </h3>
+
+      <!-- Form thêm vào giỏ -->
+      <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="mt-4">
+        <select name="sizeId" class="form-select mb-3">
+          <option disabled selected>Chọn size</option>
+          <option th:each="s : ${product.sizes}"
+                  th:value="${s.id}"
+                  th:text="${s.size + ' - Còn ' + s.stock}">
+          </option>
+        </select>
+        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+          Thêm vào giỏ 🛒
+        </button>
+      </form>
+
+      <!-- Quay lại -->
+      <a href="/store/products" class="btn btn-outline-secondary mt-3">
+        ← Quay lại danh sách
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
