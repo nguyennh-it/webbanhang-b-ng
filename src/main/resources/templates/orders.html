@@ -18,6 +18,7 @@
         <thead class="table-dark text-center">
         <tr>
             <th>Mã đơn</th>
+            <th>Thời gian đặt hàng </th>
             <th>Trạng thái</th>
             <th>Thao tác</th>
         </tr>
@@ -30,7 +31,9 @@
             <td class="text-muted small fw-bold">
                 <span th:text="${order.id}"></span>
             </td>
-
+            <td class="text-center small">    <!-- thêm -->
+                <span th:text="${#dates.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+            </td>
             <td class="text-center">
                 <span class="badge bg-primary text-uppercase" th:text="${order.status}"></span>
             </td>

@@ -18,6 +18,9 @@
                     <p><strong>Mã đơn hàng:</strong> <span th:text="${order.id}" class="text-primary fw-bold"></span></p>
                     <p><strong>Trạng thái:</strong>
                         <span th:text="${order.status}" class="badge bg-info text-uppercase"></span>
+                        <td class="text-center small">
+                            <span th:text="${#dates.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </td>
                     </p>
                 </div>
             </div>

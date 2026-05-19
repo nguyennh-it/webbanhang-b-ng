@@ -29,6 +29,7 @@ public class OrderService {
         Order order=orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
      order.setStatus(newStatus);
         order.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
         orderRepository.save(order);
      OrderStatusHistory history= OrderStatusHistory.builder()
              .id(UUID.randomUUID().toString())

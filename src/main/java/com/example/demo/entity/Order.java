@@ -2,6 +2,9 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.sql.Timestamp;
                                     //đại diện cho một đơn hàng tổng thể của người dùng.
 @Entity
@@ -22,7 +25,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String address;
+    @UpdateTimestamp
     private Timestamp updatedAt;
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at",updatable = false)
     private Timestamp createdAt; // Đổi từ created_at thành createdAt
 }

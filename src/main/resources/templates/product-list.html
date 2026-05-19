@@ -40,6 +40,7 @@
            th:class="${selectedCategoryId == cat.id} ? 'btn btn-dark' : 'btn btn-outline-dark'">
         </a>
     </div>
+
     <div th:if="${#lists.isEmpty(products)}" class="text-center my-5">
         <div class="p-5 bg-white rounded shadow-sm">
             <p class="h4 text-muted">Hiện tại chưa có sản phẩm nào trong cửa hàng.</p>
