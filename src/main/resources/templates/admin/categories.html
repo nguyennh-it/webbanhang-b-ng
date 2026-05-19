@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý danh mục</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">🏷️ Quản lý danh mục</h2>
+        <a href="/admin/dashboard" class="btn btn-outline-secondary">← Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <h5 class="fw-bold mb-3">Danh sách danh mục</h5>
+        <table class="table table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên danh mục</th>
+                <th>Slug</th>
+                <th>Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}"></td>
+                <td th:text="${cat.name}"></td>
+                <td th:text="${cat.slug}"></td>
+                <td>
+                    <span class="badge bg-success" th:text="${cat.status}"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

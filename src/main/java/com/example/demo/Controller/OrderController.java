@@ -27,8 +27,8 @@ public class OrderController {
 
     // UPDATE STATUS
     @PostMapping("/{id}/status")
-    public String updateOrderStatus(@PathVariable String id,
-                                    @RequestParam String newStatus) {
+    public String updateOrderStatus(@PathVariable("id") String id,
+                                    @RequestParam("newStatus") String newStatus) {
 
         orderService.updateStatus(
                 id,
@@ -40,7 +40,7 @@ public class OrderController {
     }
     // XEM CHI TIẾT ĐƠN HÀNG (ÁO GÌ, SIZE GÌ, SỐ LƯỢNG...)
     @GetMapping("/chi-tiet/{id}")
-    public String viewOrderDetail(@PathVariable String id, Model model) {
+    public String viewOrderDetail(@PathVariable("id") String id, Model model) {
 
         System.out.println("🔥 VIEW ORDER DETAIL IS CALLED FOR ID: " + id);
 

@@ -9,14 +9,19 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
-    ResponseEntity<ApiResponse<Void>> handlingRuntimeException(RuntimeException exception) {    //Nó bắt những lỗi mà bạn không lường trước được (ví dụ: lỗi kết nối database đột ngột,
+    ResponseEntity<ApiResponse<Void>> handlingRuntimeException
+            (RuntimeException exception, jakarta.servlet.http.HttpServletRequest request) {
+
+                                                    // Chỉ trả JSON cho API request, còn lại ném tiếp để Spring MVC xử lý
+        String uri = request.getRequestURI();
+        if (!uri.startsWith("/api") && !uri.startsWith("/product/")) {
+            throw exception; // ném lại để Spring MVC xử lý bình thường
+        }
+
         ApiResponse<Void> apiResponse = new ApiResponse<>();
         apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-
-        return ResponseEntity
-                .status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode())
-                .body(apiResponse);
+        return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode()).body(apiResponse);
     }
 
     @ExceptionHandler(value = AppException.class)

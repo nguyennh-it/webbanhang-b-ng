@@ -18,7 +18,7 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name = "total_price")
-    private double totalPrice;
+    private Double totalPrice;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String address;

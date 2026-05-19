@@ -47,9 +47,20 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
 
-                        // STORE + CART PUBLIC
-                        .requestMatchers("/store/products", "/cart", "/cart/").permitAll()
 
+                        // STORE + CART PUBLIC
+                        .requestMatchers(
+                                "/store/products",
+                                "/store/products/**",
+                                "/cart",
+                                "/cart/",
+                                "/cart/view",
+                                "/cart/add/**",
+                                "/cart/remove/**",
+                                "/cart/order",
+                                "/cart/thank-you"
+                        ).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         // ORDERS -> CHỈ ADMIN
                         .requestMatchers("/orders/**").hasRole("ADMIN")
 
@@ -57,13 +68,14 @@ public class SecurityConfig {
                         .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**")
                         .hasRole("ADMIN")
 
+
                         // CÒN LẠI PHẢI LOGIN
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/store/products", true)
+                        .defaultSuccessUrl("/admin/dashboard", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

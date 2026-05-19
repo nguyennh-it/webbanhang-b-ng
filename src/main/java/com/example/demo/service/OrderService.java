@@ -40,7 +40,7 @@ public class OrderService {
      orderStatusHistoryRepository.save(history);
     }
     public List<Order> getAllOrders() {
-        return orderRepository.findAllByOrderByUpdatedAtDesc();
+        return orderRepository.findAllByOrderByCreatedAtDesc();
 
     }
     // 1. Hàm lấy thông tin chung của đơn hàng theo ID

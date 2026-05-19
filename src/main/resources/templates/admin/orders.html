@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý đơn hàng</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">📦 Quản lý đơn hàng</h2>
+        <a href="/admin/dashboard" class="btn btn-outline-secondary">← Dashboard</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id != null ? order.id.substring(0, 8) + '...' : 'N/A'}"></td>
+                    <td th:text="${order.user != null ? order.user.username : 'N/A'}"></td>
+                    <td th:text="${order.address != null ? order.address : 'N/A'}"></td>
+                    <td class="text-danger fw-bold"
+                        th:text="${order.totalPrice != null} ? ${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'N/A'">
+                    </td>
+                    <td>
+            <span class="badge"
+                  th:classappend="${order.status != null and order.status.name() == 'PENDING'} ? 'bg-warning' :
+                                 (${order.status != null and order.status.name() == 'COMPLETED'} ? 'bg-success' : 'bg-secondary')"
+                  th:text="${order.status != null ? order.status.name() : 'N/A'}">
+            </span>
+                    </td>
+                    <td th:text="${order.createdAt != null ? order.createdAt : 'N/A'}"></td>
+                    <td>
+                        <a th:href="@{/orders/chi-tiet/{id}(id=${order.id})}"
+                           class="btn btn-sm btn-outline-primary">Xem</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
