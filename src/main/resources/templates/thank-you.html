@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Đặt hàng thành công</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5">
+    <div class="text-center py-5">
+        <div class="mb-4" style="font-size: 80px;">🎉</div>
+        <h2 class="fw-bold text-success mb-3">Cảm ơn bạn đã đặt hàng!</h2>
+        <p class="text-muted fs-5">Đơn hàng của bạn đang được xử lý.</p>
+        <p class="text-muted">Chúng tôi sẽ liên hệ với bạn sớm nhất có thể.</p>
+        <div class="mt-4 d-flex justify-content-center gap-3">
+            <a href="/store/products" class="btn btn-primary px-4">
+                Tiếp tục mua sắm
+            </a>
+            <a href="/orders" class="btn btn-outline-secondary px-4">
+                Xem đơn hàng
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

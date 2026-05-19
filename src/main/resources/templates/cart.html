@@ -72,12 +72,10 @@
                                        th:text="${totalPrice != null ? #numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}">0 VNĐ</span>
             </h4>
             <a class="btn btn-outline-secondary" href="/store/products">Quay lại mua sắm</a>
-            <form th:if="${isLoggedIn}" th:action="@{/cart/checkout}" method="post" class="d-inline">
-                <button type="submit"
-                        class="btn btn-success px-4 ms-2">
-                    Thanh toán ngay
-                </button>
-            </form>
+            <a th:if="${isLoggedIn}" th:href="@{/cart/order}"
+               class="btn btn-success px-4 ms-2">
+                Đặt hàng
+            </a>
             <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-success px-4 ms-2">
                 Đăng nhập để thanh toán
             </a>

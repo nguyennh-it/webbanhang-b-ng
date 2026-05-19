@@ -73,6 +73,39 @@ public class CartController {
             // Nếu có lỗi phát sinh (hết hàng, lỗi DB...), quay về giỏ kèm tin nhắn lỗi
             return "redirect:/cart?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
         }
-                                                        }
+    }
+    @GetMapping("/order")
+    public  String showOrderForm(Authentication auth, Model model) {
+        if (auth == null) return "redirect:/login";
 
+        // 1. Lấy thông tin giỏ hàng hiện tại để hiển thị lại ở form thanh toán
+        List<CartItem> cartItems = cartService.getCartItems(auth.getName());
+        model.addAttribute("items", cartItems);
+
+        // 2. Tính tổng tiền để hiển thị ở form thanh toán
+        double total = cartItems.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
+
+        model.addAttribute("items", cartItems);
+        model.addAttribute("totalPrice", total);
+
+        // 3. Trả về trang giao diện order-form.html
+        return "order-form";
+    }
+    @PostMapping("/order")
+    public String submitOrder(
+            @RequestParam String fullName,
+            @RequestParam String phone,
+            @RequestParam String address,
+            @RequestParam String city,
+            Authentication auth) {
+        if (auth == null) return "redirect:/login";
+        cartService.checkout(auth.getName()); // lưu đơn hàng
+        return "redirect:/cart/thank-you";
+        }
+        @GetMapping("/thank-you")
+        public String thankYou() {
+        return "thank-you";
+    }
 }
