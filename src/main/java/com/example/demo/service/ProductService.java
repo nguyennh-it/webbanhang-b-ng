@@ -1,5 +1,7 @@
 package com.example.demo.service;
+import com.example.demo.UserRepository.OrderDetailRepository;
 import com.example.demo.UserRepository.ProductSizeRepository;
+import com.example.demo.UserRepository.ReviewRepository;
 import com.example.demo.entity.ProductSize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,16 @@ public class ProductService {
     ProductRepository productRepository;
     ProductMapper productMapper;
      ProductSizeRepository productSizeRepository;
+     ReviewRepository reviewRepository;
+    OrderDetailRepository orderDetailRepository;
+
+    private ProductResponse toResponseWithRating(Product product) {
+        ProductResponse response = productMapper.toProductResponse(product);
+        response.setAvgRating(reviewRepository.findAverageRatingByProductId(product.getId()));
+        response.setReviewCount(reviewRepository.countByProductId(product.getId()));
+        response.setSoldCount(orderDetailRepository.countSoldByProductId(product.getId())); // ✅ thêm
+        return response;
+    }
     public ProductResponse createProduct(ProductRequest request) {
 
         if (productRepository.existsByName(request.getName())) {
@@ -50,7 +62,7 @@ public class ProductService {
         }
 
         // 3. trả response
-        return productMapper.toProductResponse(savedProduct);
+        return toResponseWithRating(savedProduct);
     }
 
     public void deleteProduct(String id) {
@@ -70,11 +82,11 @@ public class ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
         productMapper.updateProduct(product, request);
 
-        return productMapper.toProductResponse(productRepository.save(product));
+        return toResponseWithRating(productRepository.save(product));
     }
     public ProductResponse getProduct(String id) {
         return productRepository.findById(id)
-                .map(productMapper::toProductResponse)
+                .map(this::toResponseWithRating)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
     }
     // Sửa lại để hỗ trợ phân trang và tìm kiếm gộp làm một
@@ -100,6 +112,6 @@ public class ProductService {
         }
 
         // 3. Chuyển đổi từ Page<Entity> sang Page<ResponseDTO> bằng MapStruct
-        return productPage.map(productMapper::toProductResponse);
+        return productPage.map(this::toResponseWithRating);
     }
 }

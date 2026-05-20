@@ -6,9 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-                                            // danh gia san pham
+
 @Entity
-@Table(name = "reviews") // Ánh xạ chính xác bảng reviews trong database
+@Table(name = "reviews")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,25 +17,28 @@ import java.time.LocalDateTime;
 public class Review {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Khóa chính số tự tăng BIGINT PK
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Khóa ngoại liên kết tới bảng người dùng BIGINT FK
-    User user; // Người thực hiện đánh giá sản phẩm
+    @JoinColumn(name = "user_id", nullable = true) // ✅ nullable để không cần đăng nhập
+    User user;
+
+    @Column(name = "reviewer_name") // ✅ Thêm tên người review tự do
+    String reviewerName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false) // Khóa ngoại liên kết tới bảng sản phẩm BIGINT FK
-    Product product; // Sản phẩm được đánh giá
+    @JoinColumn(name = "product_id", nullable = false)
+    Product product;
 
-    @Column(nullable = false) // INT - Số sao đánh giá từ 1 -> 5
+    @Column(nullable = false)
     Integer rating;
 
     @Lob
-    @Column(columnDefinition = "TEXT", nullable = false) // TEXT - Nội dung bình luận chi tiết
+    @Column(columnDefinition = "TEXT", nullable = false)
     String comment;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false) // TIMESTAMP - Ngày tạo đánh giá
+    @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 }

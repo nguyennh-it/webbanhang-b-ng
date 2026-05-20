@@ -1,7 +1,9 @@
 package com.example.demo.Controller;
 import com.example.demo.dto.request.ProductRequest;
+import com.example.demo.dto.request.ReviewRequest;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
+import com.example.demo.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductViewController {
 
     ProductService productService;
-
-    // Hiển thị danh sách sản phẩm
+    ReviewService reviewService;
     CategoryService categoryService;  // ← thêm dòng này dưới ProductService
 
     @GetMapping("/products")
@@ -87,6 +88,9 @@ public class ProductViewController {
     @GetMapping("/products/{id}")
     public String productDetail(@PathVariable String id, Model model) {
         model.addAttribute("product", productService.getProduct(id));
+        model.addAttribute("reviews", reviewService.getReviewsByProductId(id));// Lấy đánh giá cho sản phẩm
+         model.addAttribute("reviewRequest",new ReviewRequest());
         return "product-detail";
     }
+
 }

@@ -21,4 +21,7 @@ public class ProductResponse {
     String category;
     String imageUrl;
     private List<ProductSizeResponse> sizes;
+    Double avgRating;   // ✅ thêm
+    Long reviewCount;
+    Long soldCount; // ✅ thêm
 }

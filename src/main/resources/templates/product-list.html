@@ -32,7 +32,7 @@
     <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
         <a th:href="@{/store/products(page=0, keyword=${keyword})}"
            th:class="${selectedCategoryId == null} ? 'btn btn-dark' : 'btn btn-outline-dark'">
-            Tất cả
+            Trang chủ
         </a>
         <a th:each="cat : ${categories}"
            th:href="@{/store/products(page=0, keyword=${keyword}, categoryId=${cat.id})}"
@@ -69,6 +69,17 @@
                            th:text="${p.price != null} ? ${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'Liên hệ'">
                             0 VNĐ
                         </p>
+                        <div class="d-flex align-items-center gap-2">
+            <span class="text-warning fw-bold">
+                ★ <span th:text="${p.avgRating != null} ? ${#numbers.formatDecimal(p.avgRating, 1, 'POINT', 1, 'POINT')} : '0.0'">0.0</span>
+            </span>
+                            <span class="text-muted small">
+                | <span th:text="${p.reviewCount != null} ? ${p.reviewCount} : '0'">0</span> đánh giá
+            </span>
+                            <span class="text-muted small">
+        · <span th:text="${p.soldCount != null} ? ${p.soldCount} : '0'">0</span> lượt bán
+    </span>
+                        </div>
                     </div>
                 </div>
             </div>
