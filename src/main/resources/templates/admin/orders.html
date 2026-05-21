@@ -30,7 +30,6 @@
                 <tr th:each="order : ${orders}">
                     <td th:text="${order.id != null ? order.id.substring(0, 8) + '...' : 'N/A'}"></td>
                     <td th:text="${order.user != null ? order.user.username : 'N/A'}"></td>
-                    <td th:text="${order.address != null ? order.address : 'N/A'}"></td>
                     <td class="text-danger fw-bold"
                         th:text="${order.totalPrice != null} ? ${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'N/A'">
                     </td>
@@ -41,7 +40,7 @@
                   th:text="${order.status != null ? order.status.name() : 'N/A'}">
             </span>
                     </td>
-                    <td th:text="${order.createdAt != null ? order.createdAt : 'N/A'}"></td>
+                    <td th:text="${order.createdAt != null} ? ${#strings.substring(order.createdAt.toString(), 0, 16)} : 'N/A'"></td>
                     <td>
                         <a th:href="@{/orders/chi-tiet/{id}(id=${order.id})}"
                            class="btn btn-sm btn-outline-primary">Xem</a>

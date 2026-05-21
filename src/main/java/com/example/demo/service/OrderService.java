@@ -1,11 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.UserRepository.OrderDetailRepository;
-import com.example.demo.UserRepository.OrderRepository;
-import com.example.demo.UserRepository.OrderStatusHistoryRepository;
+import com.example.demo.repository.OrderDetailRepository;
+import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.OrderStatusHistoryRepository;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderDetail;
-import com.example.demo.entity.OrderStatus;
+import com.example.demo.Enum.OrderStatus;
 import com.example.demo.entity.OrderStatusHistory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -21,17 +21,17 @@ public class ProductViewController {
 
     ProductService productService;
     ReviewService reviewService;
-    CategoryService categoryService;  // ← thêm dòng này dưới ProductService
+    CategoryService categoryService;
 
-    @GetMapping("/products")
+    @GetMapping("/products")                                    // hiển thị danh sách sản phẩm
     public String listProducts(
             Model model,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "categoryId", required = false) Long categoryId) {  // ← thêm categoryId
+            @RequestParam(name = "categoryId", required = false) Long categoryId) {
 
         int pageSize = 6;
-        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);  // ← thêm categoryId
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);
         model.addAttribute("products", pageData.getContent());
         model.addAttribute("totalPages", pageData.getTotalPages());
         model.addAttribute("currentPage", page);

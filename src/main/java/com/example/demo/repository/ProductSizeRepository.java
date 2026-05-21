@@ -1,4 +1,4 @@
-package com.example.demo.UserRepository;
+package com.example.demo.repository;
 
 import com.example.demo.entity.ProductSize;
 import org.springframework.data.jpa.repository.JpaRepository;

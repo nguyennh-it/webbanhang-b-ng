@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.entity.OrderStatus;
+import com.example.demo.Enum.OrderStatus;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

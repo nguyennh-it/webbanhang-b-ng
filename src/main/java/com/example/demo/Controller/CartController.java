@@ -101,9 +101,9 @@ public class CartController {
             @RequestParam String city,
             Authentication auth) {
         if (auth == null) return "redirect:/login";
-        cartService.checkout(auth.getName()); // lưu đơn hàng
-        return "redirect:/cart/thank-you";
-        }
+        String orderId = cartService.checkout(auth.getName()); // lấy orderId
+        return "redirect:/payment?orderId=" + orderId;         // redirect sang trang chọn thanh toán
+                                                        }
         @GetMapping("/thank-you")
         public String thankYou() {
         return "thank-you";

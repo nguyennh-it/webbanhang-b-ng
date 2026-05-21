@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.UserRepository.ProductRepository;
-import com.example.demo.UserRepository.ReviewRepository;
+import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.ReviewRepository;
 import com.example.demo.dto.request.ReviewRequest;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.Review;

@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

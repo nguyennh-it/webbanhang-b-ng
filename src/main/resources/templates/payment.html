@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chọn phương thức thanh toán</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm p-4">
+        <h4 class="fw-bold mb-1">Thanh toán đơn hàng</h4>
+        <p class="text-muted mb-4">
+            Mã đơn: <span th:text="${orderId}" class="fw-bold text-dark"></span>
+        </p>
+
+        <div class="d-flex justify-content-between mb-4 p-3 bg-light rounded">
+            <span class="fw-bold">Tổng tiền</span>
+            <span class="text-danger fw-bold"
+                  th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+            </span>
+        </div>
+
+        <form th:action="@{/payment/confirm}" method="post">
+            <input type="hidden" name="orderId" th:value="${orderId}">
+
+            <label class="fw-bold mb-3 d-block">Chọn phương thức thanh toán:</label>
+
+            <div class="form-check border rounded p-3 mb-2">
+                <input class="form-check-input" type="radio" name="method" value="COD" id="cod" checked>
+                <label class="form-check-label fw-bold" for="cod">
+                    Thanh toán khi nhận hàng (COD)
+                </label>
+                <p class="text-muted small mb-0">Trả tiền mặt khi giao hàng</p>
+            </div>
+
+            <div class="form-check border rounded p-3 mb-2">
+                <input class="form-check-input" type="radio" name="method" value="VNPAY" id="vnpay">
+                <label class="form-check-label fw-bold" for="vnpay">
+                    Thanh toán qua VNPAY
+                </label>
+                <p class="text-muted small mb-0">Thẻ ATM, Visa, QR Code</p>
+            </div>
+
+            <div class="form-check border rounded p-3 mb-4">
+                <input class="form-check-input" type="radio" name="method" value="MOMO" id="momo">
+                <label class="form-check-label fw-bold" for="momo">
+                    Thanh toán qua MoMo
+                </label>
+                <p class="text-muted small mb-0">Ví điện tử MoMo</p>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                Xác nhận thanh toán
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

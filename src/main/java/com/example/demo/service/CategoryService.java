@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.UserRepository.CategoryRepository;
+import com.example.demo.repository.CategoryRepository;
 import com.example.demo.entity.Category;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

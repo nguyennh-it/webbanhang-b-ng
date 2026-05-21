@@ -1,12 +1,12 @@
 package com.example.demo.service;
-import com.example.demo.UserRepository.OrderDetailRepository;
-import com.example.demo.UserRepository.ProductSizeRepository;
-import com.example.demo.UserRepository.ReviewRepository;
+import com.example.demo.repository.OrderDetailRepository;
+import com.example.demo.repository.ProductSizeRepository;
+import com.example.demo.repository.ReviewRepository;
 import com.example.demo.entity.ProductSize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import com.example.demo.UserRepository.ProductRepository;
+import com.example.demo.repository.ProductRepository;
 import com.example.demo.dto.request.ProductRequest;
 import com.example.demo.dto.response.ProductResponse;
 import com.example.demo.entity.Product;
@@ -35,7 +35,7 @@ public class ProductService {
         ProductResponse response = productMapper.toProductResponse(product);
         response.setAvgRating(reviewRepository.findAverageRatingByProductId(product.getId()));
         response.setReviewCount(reviewRepository.countByProductId(product.getId()));
-        response.setSoldCount(orderDetailRepository.countSoldByProductId(product.getId())); // ✅ thêm
+        response.setSoldCount(orderDetailRepository.countSoldByProductId(product.getId()));
         return response;
     }
     public ProductResponse createProduct(ProductRequest request) {

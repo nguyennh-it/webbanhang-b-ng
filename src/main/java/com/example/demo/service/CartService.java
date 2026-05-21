@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.UserRepository.*;
+import com.example.demo.Enum.OrderStatus;
+import com.example.demo.repository.*;
 import com.example.demo.entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,10 +80,11 @@ public class CartService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public void checkout(String username) {
+    public String checkout(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
         List<CartItem> cartItems = cartItemRepository.findByUserUsername(username);
+
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Giỏ hàng đang trống, không thể thanh toán!");
         }
@@ -116,5 +118,8 @@ public class CartService {
         }
 // 🔥 QUAN TRỌNG NHẤT: xóa giỏ hàng
         cartItemRepository.deleteByUserUsername(username);
+        cartItemRepository.deleteByUserUsername(username);
+        return order.getId();
     }
+
 }

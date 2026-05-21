@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.UserRepository.UserRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.entity.User;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
