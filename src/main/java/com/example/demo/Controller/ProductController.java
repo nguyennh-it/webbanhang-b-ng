@@ -1,4 +1,4 @@
-package com.example.demo.Controller;
+package com.example.demo.controller;
 
 import com.example.demo.dto.request.ProductRequest;
 import com.example.demo.dto.response.ApiResponse;

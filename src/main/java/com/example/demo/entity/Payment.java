@@ -42,6 +42,6 @@ public class Payment {
     @Column(nullable = false, length = 50)
     PaymentStatus status;
 
-    @Column(name = "paid_at")
+    @Column(name = "paid_at")               // thơ gian thanh toán thành công
     LocalDateTime paidAt;
 }

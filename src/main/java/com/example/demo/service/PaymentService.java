@@ -39,7 +39,7 @@ public class PaymentService {
             throw new IllegalStateException("Payment đã xử lý, trạng thái: " + payment.getStatus());
         }
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setTransactionCode(transactionCode);
+        payment.setTransactionCode(transactionCode);                    // mã gg
         payment.setPaidAt(java.time.LocalDateTime.now()); //lưu thời gian thanh toán
 
     }
