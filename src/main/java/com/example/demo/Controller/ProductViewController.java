@@ -10,6 +10,7 @@ import com.example.demo.service.ReviewService;
 import com.example.demo.service.WishlistService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
+import com.example.demo.service.BannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,8 +34,8 @@ public class ProductViewController {
     ReviewService reviewService;
     CategoryService categoryService;
     WishlistService wishlistService;
-    UserRepository userRepository;  // ← thêm
-
+    UserRepository userRepository;
+    BannerService bannerService;
     // Helper lấy userId từ username
     private String getUserId(UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -58,7 +59,7 @@ public class ProductViewController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("categories", categoryService.getAllCategories());
-
+        model.addAttribute("banners",bannerService.getActiveBanners());
         // Lấy wishlistIds nếu đã đăng nhập
         if (userDetails != null) {
             String userId = getUserId(userDetails);

@@ -4,7 +4,6 @@
     <title>Cửa Hàng Đồ Thể Thao</title>
     <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
 
-    <!-- CSRF cho AJAX -->
     <meta name="_csrf" th:content="${_csrf?.token}"/>
     <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
 
@@ -24,6 +23,24 @@
             object-fit: cover;
         }
 
+        /* ===== CSS BANNER SLIDER ===== */
+        /* ===== CSS BANNER SLIDER ===== */
+        .banner-carousel-inner {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background-color: #0d1a3a; /* Tạo màu nền xanh tối tiệp màu với áo tuyển Ý */
+            text-align: center; /* Giúp căn giữa tấm ảnh nếu ảnh nhỏ hơn khung */
+        }
+        .banner-img {
+            height: 550px;
+            width: auto; /* Thay vì 100%, hãy để auto để ảnh giữ nguyên chiều rộng gốc */
+            max-width: 100%; /* Không được vượt quá khung container */
+            object-fit: contain; /* Giữ nguyên tỉ lệ, không méo, không vỡ */
+            margin: 0 auto; /* Căn giữa tấm ảnh ra giữa banner */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
         /* ===== NÚT TIM ===== */
         .btn-wishlist {
             position: absolute;
@@ -62,6 +79,17 @@
             z-index: 9999;
             box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
+        /* ===== RESPONSIVE CHO BANNER (MOBILE & TABLET) ===== */
+        @media (max-width: 992px) {
+            .banner-img {
+                height: 400px; /* Hạ chiều cao trên máy tính bảng */
+            }
+        }
+        @media (max-width: 768px) {
+            .banner-img {
+                height: 280px; /* Chiều cao tối ưu trên điện thoại di động */
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -69,9 +97,39 @@
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
 <div class="container mt-5">
+
+    <div id="sportStoreCarousel" class="carousel slide mb-5" data-bs-ride="carousel" th:if="${not #lists.isEmpty(banners)}">
+        <div class="carousel-indicators">
+            <button th:each="banner, iterStat : ${banners}"
+                    type="button"
+                    data-bs-target="#sportStoreCarousel"
+                    th:data-bs-slide-to="${iterStat.index}"
+                    th:class="${iterStat.first} ? 'active' : ''">
+            </button>
+        </div>
+        <div class="carousel-inner banner-carousel-inner">
+            <div th:each="banner, iterStat : ${banners}"
+                 th:class="${iterStat.first} ? 'carousel-item active' : 'carousel-item'">
+                <a th:href="${banner.link != null and !#strings.isEmpty(banner.link) ? banner.link : '#'}">
+                    <img th:src="${banner.image}" class="d-block banner-img" th:alt="${banner.title}">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 px-3 py-2">
+                        <h4 th:text="${banner.title}" class="text-white m-0">Tiêu đề Banner</h4>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#sportStoreCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#sportStoreCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
     <h1 class="text-center mb-5 fw-bold">👟 Danh Mục Sản Phẩm ⚽</h1>
 
-    <!-- Tab lọc danh mục -->
     <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
         <a th:href="@{/store/products(page=0, keyword=${keyword})}"
            th:class="${selectedCategoryId == null} ? 'btn btn-dark' : 'btn btn-outline-dark'">
@@ -95,7 +153,6 @@
         <div class="col" th:each="p : ${products}">
             <div class="card h-100 shadow-sm product-card" style="position:relative;">
 
-                <!-- ===== NÚT TIM ===== -->
                 <button class="btn-wishlist"
                         th:data-product-id="${p.id}"
                         th:title="${wishlistIds != null and wishlistIds.contains(p.id)} ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'"
@@ -103,7 +160,6 @@
                     <span th:text="${wishlistIds != null and wishlistIds.contains(p.id)} ? '❤️' : '🤍'">🤍</span>
                 </button>
 
-                <!-- Ảnh sản phẩm (click vào ảnh/card vẫn vào detail) -->
                 <a th:href="@{/store/products/{id}(id=${p.id})}">
                     <img th:src="${p.imageUrl != null and !#strings.isEmpty(p.imageUrl)} ? ${p.imageUrl} : 'https://placehold.co/300x200?text=Sport+Store'"
                          class="card-img-top" alt="Ảnh sản phẩm"
@@ -141,7 +197,6 @@
         </div>
     </div>
 
-    <!-- Phân trang -->
     <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5">
         <nav>
             <ul class="pagination shadow-sm">
@@ -162,16 +217,13 @@
 
 <div th:replace="~{fragments/layout :: footer}"></div>
 
-<!-- Toast thông báo -->
 <div id="wishlistToast"></div>
 
 <script>
     const csrf = document.querySelector('meta[name="_csrf"]')?.content || '';
 
     function toggleWishlist(btn) {
-        // Ngăn không cho click lan ra card (không vào product detail)
         event.stopPropagation();
-
         const productId = btn.dataset.productId;
 
         fetch('/wishlist/toggle/' + productId, {
@@ -180,7 +232,6 @@
         })
             .then(r => {
                 if (r.status === 302 || r.redirected) {
-                    // Chưa đăng nhập → redirect login
                     window.location.href = '/login';
                     return null;
                 }
