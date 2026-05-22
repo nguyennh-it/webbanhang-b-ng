@@ -52,7 +52,7 @@ public class ProductViewController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         int pageSize = 6;
-        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);         // đóng goi
         model.addAttribute("products", pageData.getContent());
         model.addAttribute("totalPages", pageData.getTotalPages());
         model.addAttribute("currentPage", page);
