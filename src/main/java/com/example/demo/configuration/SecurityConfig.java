@@ -41,12 +41,12 @@ public class SecurityConfig {
                         // PUBLIC
                         .requestMatchers(
                                 "/login",
+                                "/register",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
                                 "/webjars/**"
                         ).permitAll()
-
 
                         // STORE + CART PUBLIC
                         .requestMatchers(
@@ -60,22 +60,22 @@ public class SecurityConfig {
                                 "/cart/order",
                                 "/cart/thank-you"
                         ).permitAll()
+
+                        // ADMIN ONLY
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // ORDERS -> CHỈ ADMIN
                         .requestMatchers("/orders/**").hasRole("ADMIN")
+                        .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**").hasRole("ADMIN")
 
-                        // STORE ADMIN ACTIONS
-                        .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**")
-                        .hasRole("ADMIN")
+                        // PHẢI ĐĂNG NHẬP
+                        .requestMatchers("/wishlist/**").authenticated()
 
-
-                        // CÒN LẠI PHẢI LOGIN
+                        // CÒN LẠI
                         .anyRequest().permitAll()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .defaultSuccessUrl("/store/products", true) // ← chuyển về trang sản phẩm sau login
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
