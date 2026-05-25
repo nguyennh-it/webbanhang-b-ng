@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.CartItem;
 import com.example.demo.service.CartService;
+import com.example.demo.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
+    private final VoucherService voucherService;
     @GetMapping({"","/", "/view"})
     public String viewCart(Model model, Authentication auth) {
 
@@ -93,17 +95,31 @@ public class CartController {
         // 3. Trả về trang giao diện order-form.html
         return "order-form";
     }
-    @PostMapping("/order")
-    public String submitOrder(
-            @RequestParam String fullName,
-            @RequestParam String phone,
-            @RequestParam String address,
-            @RequestParam String city,
-            Authentication auth) {
-        if (auth == null) return "redirect:/login";
-        String orderId = cartService.checkout(auth.getName()); // lấy orderId
-        return "redirect:/payment?orderId=" + orderId;         // redirect sang trang chọn thanh toán
-                                                        }
+                                                        @PostMapping("/order")
+                                                        public String submitOrder(
+                                                                @RequestParam String fullName,
+                                                                @RequestParam String phone,
+                                                                @RequestParam String address,
+                                                                @RequestParam String city,
+                                                                @RequestParam(required = false) String voucherCode,
+                                                                @RequestParam(required = false) Double finalAmount,
+                                                                Authentication auth) {
+                                                            if (auth == null) return "redirect:/login";
+
+                                                            String orderId = cartService.checkout(auth.getName());
+
+                                                            // Trừ quantity voucher nếu có dùng
+                                                            if (voucherCode != null && !voucherCode.isEmpty()) {
+                                                                voucherService.consumeVoucher(voucherCode);
+                                                            }
+
+                                                            // Truyền finalAmount sang trang thanh toán
+                                                            String redirectUrl = "redirect:/payment?orderId=" + orderId;
+                                                            if (finalAmount != null) {
+                                                                redirectUrl += "&finalAmount=" + finalAmount.longValue();
+                                                            }
+                                                            return redirectUrl;
+    }
         @GetMapping("/thank-you")
         public String thankYou() {
         return "thank-you";

@@ -15,7 +15,13 @@ public enum ErrorCode {
     USER_EXISTED(1005, "Người dùng đã tồn tại",HttpStatus.BAD_REQUEST),
     PASSWORD_INVALID(1006,"Mật khẩu phải có 8 ký tự trở lên",HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1007, "Người dùng phải có 3 ký tự trở lên",HttpStatus.BAD_REQUEST ),
-    USER_NOT_EXISTED(1005, "Người dùng không  tồn tại",HttpStatus.BAD_REQUEST)
+    USER_NOT_EXISTED(1005, "Người dùng không  tồn tại",HttpStatus.BAD_REQUEST),
+    VOUCHER_NOT_FOUND(4001, "Mã voucher không tồn tại", HttpStatus.BAD_REQUEST),
+    VOUCHER_INACTIVE(4002, "Voucher không còn hiệu lực", HttpStatus.BAD_REQUEST),
+    VOUCHER_NOT_STARTED(4003, "Voucher chưa đến thời gian sử dụng", HttpStatus.BAD_REQUEST),
+    VOUCHER_EXPIRED(4004, "Voucher đã hết hạn", HttpStatus.BAD_REQUEST),
+    VOUCHER_OUT_OF_STOCK(4005, "Voucher đã hết lượt sử dụng", HttpStatus.BAD_REQUEST),
+    VOUCHER_MIN_ORDER(4006, "Đơn hàng chưa đạt giá trị tối thiểu", HttpStatus.BAD_REQUEST)
     ;
 
 

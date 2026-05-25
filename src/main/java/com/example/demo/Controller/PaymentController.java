@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+                                //json
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor

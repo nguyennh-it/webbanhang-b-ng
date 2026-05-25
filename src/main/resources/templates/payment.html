@@ -14,15 +14,38 @@
             Mã đơn: <span th:text="${orderId}" class="fw-bold text-dark"></span>
         </p>
 
-        <div class="d-flex justify-content-between mb-4 p-3 bg-light rounded">
-            <span class="fw-bold">Tổng tiền</span>
-            <span class="text-danger fw-bold"
+        <!-- Hiển thị giá gốc nếu có voucher -->
+        <div th:if="${finalAmount != null and finalAmount != order.totalPrice}"
+             class="d-flex justify-content-between mb-2 p-3 bg-light rounded">
+            <span class="text-muted">Giá gốc</span>
+            <span class="text-muted text-decoration-line-through"
                   th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+            </span>
+        </div>
+
+        <!-- Dòng giảm giá -->
+        <div th:if="${finalAmount != null and finalAmount != order.totalPrice}"
+             class="d-flex justify-content-between mb-2 px-3 text-success">
+            <span>🎉 Đã giảm</span>
+            <span class="fw-bold"
+                  th:text="'-' + ${#numbers.formatDecimal(order.totalPrice - finalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+            </span>
+        </div>
+
+        <!-- Tổng thanh toán thực tế -->
+        <div class="d-flex justify-content-between mb-4 p-3 bg-light rounded">
+            <span class="fw-bold">Tổng thanh toán</span>
+            <span class="text-danger fw-bold fs-5"
+                  th:text="${finalAmount != null}
+                      ? ${#numbers.formatDecimal(finalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'
+                      : ${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
             </span>
         </div>
 
         <form th:action="@{/payment/confirm}" method="post">
             <input type="hidden" name="orderId" th:value="${orderId}">
+            <input type="hidden" name="finalAmount"
+                   th:value="${finalAmount != null ? finalAmount : order.totalPrice}">
 
             <label class="fw-bold mb-3 d-block">Chọn phương thức thanh toán:</label>
 

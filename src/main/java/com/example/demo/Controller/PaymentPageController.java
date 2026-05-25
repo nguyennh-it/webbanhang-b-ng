@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+                                                        //form
 @Controller
 @RequestMapping("/payment")
 @RequiredArgsConstructor
@@ -22,11 +22,15 @@ public class PaymentPageController {
     private final PaymentRepository paymentRepository;
 
     @GetMapping
-    public String showPaymentPage(@RequestParam String orderId, Model model) {
+    public String showPaymentPage(
+            @RequestParam String orderId,
+            @RequestParam(required = false) Double finalAmount,
+            Model model) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
         model.addAttribute("order", order);
         model.addAttribute("orderId", orderId);
+        model.addAttribute("finalAmount", finalAmount); // ← thêm dòng này
         return "payment";
     }
 

@@ -3,18 +3,63 @@
 <head>
     <title>Đặt Hàng</title>
     <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+    <style>
+        .voucher-card {
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .voucher-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 5px;
+            background: #dc3545;
+            border-radius: 10px 0 0 10px;
+        }
+        .voucher-card:hover { border-color: #dc3545; box-shadow: 0 2px 8px rgba(220,53,69,0.15); }
+        .voucher-card.selected { border-color: #dc3545; background: #fff8f8; }
+        .voucher-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 8px; right: 10px;
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .voucher-badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 99px;
+            font-weight: 600;
+        }
+        .voucher-list-scroll {
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .voucher-list-scroll::-webkit-scrollbar { width: 4px; }
+        .voucher-list-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        .discount-row { display: none; }
+        .tag-percent { background: #fff3cd; color: #856404; }
+        .tag-fixed { background: #d1ecf1; color: #0c5460; }
+    </style>
 </head>
 <body class="bg-light">
 <div th:replace="~{fragments/layout :: navbar}"></div>
 
-<div class="container mt-5">
-    <div class="row g-5">
+<div class="container mt-5 pb-5">
+    <div class="row g-4">
 
         <!-- Form thông tin -->
         <div class="col-md-7">
             <div class="card shadow-sm p-4">
-                <h4 class="fw-bold mb-4">📦 Thông tin giao hàng</h4>
-                <form th:action="@{/cart/order}" method="post">
+                <h5 class="fw-bold mb-4">📦 Thông tin giao hàng</h5>
+                <form th:action="@{/cart/order}" method="post" id="orderForm">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Họ và tên</label>
                         <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>
@@ -35,37 +80,213 @@
                         <label class="form-label fw-bold">Ghi chú (tuỳ chọn)</label>
                         <textarea name="note" class="form-control" rows="2" placeholder="Ghi chú khi giao hàng..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                    <input type="hidden" name="voucherCode" id="hiddenVoucherCode">
+                    <input type="hidden" name="finalAmount" id="hiddenFinalAmount" th:value="${totalPrice}">
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-2">
                         ✅ Xác nhận đặt hàng
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Tóm tắt đơn hàng -->
+        <!-- Cột phải -->
         <div class="col-md-5">
+
+            <!-- VOUCHER CARD -->
+            <div class="card shadow-sm p-4 mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0">🎟️ Mã giảm giá</h6>
+                    <span class="text-muted small" id="voucherCount"></span>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" id="voucherInput" class="form-control form-control-sm"
+                           placeholder="Nhập mã voucher..." style="text-transform:uppercase; letter-spacing:1px">
+                    <button class="btn btn-dark btn-sm fw-bold px-3" onclick="applyCode()">Áp dụng</button>
+                </div>
+
+                <div id="voucherMsg" class="small mb-2" style="display:none"></div>
+
+                <div class="voucher-list-scroll" id="voucherList">
+                    <div class="text-center text-muted small py-3">
+                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <span class="ms-2">Đang tải voucher...</span>
+                    </div>
+                </div>
+
+                <div id="selectedBadge" class="mt-2 p-2 rounded-2 border border-success bg-white" style="display:none">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-success fw-bold small" id="selectedName"></span>
+                            <span class="text-success small ms-1" id="selectedDiscount"></span>
+                        </div>
+                        <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="removeVoucher()">✕ Bỏ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TÓM TẮT ĐƠN HÀNG -->
             <div class="card shadow-sm p-4">
-                <h4 class="fw-bold mb-4">🛒 Đơn hàng của bạn</h4>
-                <div th:each="item : ${items}" class="d-flex justify-content-between mb-2">
+                <h6 class="fw-bold mb-3">🛒 Đơn hàng của bạn</h6>
+                <div th:each="item : ${items}" class="d-flex justify-content-between mb-2 small">
                     <div>
-                        <span th:text="${item.product.name}"></span>
-                        <small class="text-muted d-block">Size: <span th:text="${item.productSize?.size}"></span> × <span th:text="${item.quantity}"></span></small>
+                        <span th:text="${item.product.name}" class="fw-semibold"></span>
+                        <span class="text-muted ms-1">× <span th:text="${item.quantity}"></span></span>
+                        <div class="text-muted" style="font-size:12px">
+                            Size: <span th:text="${item.productSize?.size}"></span>
+                        </div>
                     </div>
                     <span class="fw-bold text-danger"
                           th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
                     </span>
                 </div>
-                <hr>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="text-muted">Tạm tính</span>z
+                    <span id="originalPrice"
+                          th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                </div>
+                <div class="d-flex justify-content-between small mb-1 text-success discount-row" id="discountRow">
+                    <span>🎉 Giảm giá</span>
+                    <span id="discountDisplay" class="fw-bold"></span>
+                </div>
+                <hr class="my-2">
                 <div class="d-flex justify-content-between fw-bold">
-                    <span>Tổng cộng</span>
-                    <span class="text-danger"
-                          th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
-                    </span>
+                    <span>Tổng thanh toán</span>
+                    <span class="text-danger fs-5" id="finalPrice"
+                          th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    const totalPrice = /*[[${totalPrice}]]*/ 0;                /* Khai báo biến toàn cục và Định dạng tiền tệ*/
+    const fmt = n => Math.round(n).toLocaleString('vi-VN') + ' VNĐ';
+    let appliedCode = null;
+
+    async function loadVouchers() {                                             //Tự động chạy khi người dùng mở trang lấy vocher
+        const el = document.getElementById('voucherList');
+        try {
+            const res = await fetch('/api/vouchers/active');
+            const raw = await res.json();
+
+            // FIX 1: đảm bảo luôn là array dù API trả object hay array
+            const vouchers = Array.isArray(raw) ? raw : [];
+
+            // FIX 2: dùng vouchers.length thay vì list.length
+            document.getElementById('voucherCount').textContent = vouchers.length + ' mã khả dụng';
+
+            if (vouchers.length === 0) {
+                el.innerHTML = '<p class="text-muted small text-center py-2">Không có voucher nào khả dụng</p>';
+                return;
+            }
+
+            el.innerHTML = vouchers.map(v => {                      //kiểm tra chữ cho từng thẻ vocher(% . tiền)                const isPercent = v.discountType === 'PERCENT';
+                const discountText = isPercent
+                    ? `Giảm ${v.discountValue}% (tối đa ${fmt(v.maxDiscount)})`
+                    : `Giảm ${fmt(v.discountValue)}`;
+                const minText = v.minOrderAmount > 0
+                    ? `Đơn tối thiểu ${fmt(v.minOrderAmount)}`
+                    : 'Không giới hạn đơn';
+                const tagClass = isPercent ? 'tag-percent' : 'tag-fixed';
+                const tagText = isPercent ? `${v.discountValue}% OFF` : `-${fmt(v.discountValue)}`;
+                const expire = new Date(v.endDate).toLocaleDateString('vi-VN');
+
+                return `                                                        <!--biến thànhđ liệu đẹp hơn-->
+                <div class="voucher-card mb-2" id="card-${v.code}"
+                     onclick="selectVoucher('${v.code}')">
+                    <div class="d-flex justify-content-between align-items-start ps-2">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="fw-bold" style="font-size:13px">${v.code}</span>
+                                <span class="voucher-badge ${tagClass}">${tagText}</span>
+                            </div>
+                            <div class="text-muted" style="font-size:12px">${discountText}</div>
+                            <div class="text-muted" style="font-size:11px">${minText} · HSD: ${expire}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch(e) {                                                //báo lỗi và tránh sập giao diện người dùng
+            el.innerHTML = '<p class="text-danger small text-center py-2">Không thể tải voucher</p>';
+            console.error('loadVouchers error:', e);
+        }
+    }
+
+    function selectVoucher(code) {                                  //khi người dùng ấn thì nó sẽ app mã vào ô
+        document.getElementById('voucherInput').value = code;
+        applyCode();
+    }
+
+    async function applyCode() {                                //thông báo, chuẩn hóa
+        const code = document.getElementById('voucherInput').value.trim().toUpperCase();
+        if (!code) { showMsg('Vui lòng nhập mã voucher', 'text-danger'); return; }
+
+        try {                                                       //guiwr mã về cho service để xl
+            const res = await fetch('/api/vouchers/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code, orderAmount: totalPrice })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {                              // kiểm tra mã
+                showMsg(data.message || 'Mã không hợp lệ', 'text-danger');
+                return;
+            }
+
+            appliedCode = code;                                                 //trừ ngầm app mã
+            document.getElementById('hiddenVoucherCode').value = code;
+            document.getElementById('hiddenFinalAmount').value = data.finalAmount;
+
+            document.querySelectorAll('.voucher-card').forEach(c => c.classList.remove('selected'));//viền đỏ để xác định đang chọn mã nào
+            const card = document.getElementById('card-' + code);
+            if (card) card.classList.add('selected');
+
+            document.getElementById('selectedName').textContent = data.name;            //hiển thị một cái nhãn nhỏ để sinh động hơn
+            document.getElementById('selectedDiscount').textContent = '(-' + fmt(data.discountAmount) + ')';
+            document.getElementById('selectedBadge').style.display = 'block';
+
+            document.getElementById('discountDisplay').textContent = '-' + fmt(data.discountAmount);
+            document.getElementById('discountRow').style.display = 'flex';
+            document.getElementById('finalPrice').textContent = fmt(data.finalAmount);
+
+            showMsg('✓ Áp dụng thành công!', 'text-success');
+
+        } catch(e) {
+            showMsg('Lỗi kết nối, vui lòng thử lại', 'text-danger');
+        }
+    }
+                                                            // hàm hủy app dụng mã
+    function removeVoucher() {
+        appliedCode = null;
+        document.getElementById('voucherInput').value = '';
+        document.getElementById('hiddenVoucherCode').value = '';
+        document.getElementById('hiddenFinalAmount').value = totalPrice;
+        document.getElementById('selectedBadge').style.display = 'none';
+        document.getElementById('discountRow').style.display = 'none';
+        document.getElementById('finalPrice').textContent = fmt(totalPrice);
+        document.querySelectorAll('.voucher-card').forEach(c => c.classList.remove('selected'));
+        showMsg('Đã bỏ mã voucher', 'text-muted');
+    }
+
+    function showMsg(msg, cls) {                    // ẩn các hiển thị giảm giá đi
+        const el = document.getElementById('voucherMsg');
+        el.textContent = msg;
+        el.className = 'small mb-1 ' + cls;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    document.getElementById('voucherInput').addEventListener('keydown', e => {  //tư động hiểu gõ j
+        if (e.key === 'Enter') { e.preventDefault(); applyCode(); }
+    });
+
+    loadVouchers();
+</script>
 </body>
 </html>
