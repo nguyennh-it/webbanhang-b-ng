@@ -184,7 +184,8 @@
                 return;
             }
 
-            el.innerHTML = vouchers.map(v => {                      //kiểm tra chữ cho từng thẻ vocher(% . tiền)                const isPercent = v.discountType === 'PERCENT';
+            el.innerHTML = vouchers.map(v => {
+                const isPercent = v.discountType === 'PERCENT';  //kiểm tra chữ cho từng thẻ vocher(% . tiền)                const isPercent = v.discountType === 'PERCENT';
                 const discountText = isPercent
                     ? `Giảm ${v.discountValue}% (tối đa ${fmt(v.maxDiscount)})`
                     : `Giảm ${fmt(v.discountValue)}`;
