@@ -19,15 +19,13 @@ public class BrandController {
     // 1. Xem danh sách brand
     @GetMapping
     public String getAllBrands(Model model){
-        // Giữ nguyên theo ý bạn, ngoài file admin/brands.html sẽ gọi th:each="b : ${brand}"
-        model.addAttribute("brand", brandService.getAll());
+        model.addAttribute("brands", brandService.getAll());
         return "admin/brands";
     }
 
     // 2. Hiện form thêm mới
     @GetMapping("/create")
     public String showCreateForm(Model model){
-        // Đã sửa: "brands" -> "brand" cho đồng bộ với th:object="${brand}"
         model.addAttribute("brand", new Brand());
         return "admin/brands-create";
     }
@@ -43,16 +41,17 @@ public class BrandController {
     }
 
     // 4. Hiện form sửa
+    // ĐÃ SỬA: Thêm ("id")
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model){
-        // Đã sửa: "brands" -> "brand" để sang trang edit bind dữ liệu cũ lên form chuẩn xác
+    public String showEditForm(@PathVariable("id") Long id, Model model){
         model.addAttribute("brand", brandService.getById(id));
         return "admin/brand-edit";
     }
 
     // 5. Xử lý lưu dữ liệu sau khi sửa
+    // ĐÃ SỬA: Thêm ("id")
     @PostMapping("/edit/{id}")
-    public String updateBrand(@PathVariable Long id, @ModelAttribute Brand brand){
+    public String updateBrand(@PathVariable("id") Long id, @ModelAttribute Brand brand){
         if (brand.getStatus() == null) {
             brand.setStatus("INACTIVE");
         }
@@ -61,8 +60,9 @@ public class BrandController {
     }
 
     // 6. Xóa brand
+    // ĐÃ SỬA: Thêm ("id")
     @GetMapping("/delete/{id}")
-    public String deleteBrand(@PathVariable Long id){
+    public String deleteBrand(@PathVariable("id") Long id){
         brandService.delete(id);
         return "redirect:/admin/brands";
     }

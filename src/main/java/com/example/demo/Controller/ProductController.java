@@ -27,23 +27,21 @@ public class ProductController {
     @PostMapping("/add")
     public String createProduct(@ModelAttribute @Valid ProductRequest request) {
         productService.createProduct(request);
-        return "redirect:/store/products";  // sửa lại cho đúng
+        return "redirect:/store/products";
     }
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ApiResponse<ProductResponse> getProduct(@PathVariable String id) {
+    public ApiResponse<ProductResponse> getProduct(@PathVariable("id") String id) {
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.getProduct(id))
                 .build();
     }
 
     @GetMapping("/products/{id}")
-    public String viewProductDetail(@PathVariable String id, Model model) {
+    public String viewProductDetail(@PathVariable("id") String id, Model model) {
         var product = productService.getProduct(id);
         model.addAttribute("product", product);
         return "product-detail";
     }
-
-    // ĐÃ XÓA method showStorePage ở đây
 }

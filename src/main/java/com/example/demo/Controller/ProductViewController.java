@@ -33,7 +33,7 @@ public class ProductViewController {
     UserRepository userRepository;
     BannerService bannerService;
     BrandService brandService;
-    // Helper lấy userId từ username
+
     private String getUserId(UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
@@ -50,7 +50,7 @@ public class ProductViewController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         int pageSize = 6;
-        var pageData = productService.getProducts(page, pageSize, keyword, categoryId,brandId);         // đóng goi
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId, brandId);
         model.addAttribute("products", pageData.getContent());
         model.addAttribute("totalPages", pageData.getTotalPages());
         model.addAttribute("currentPage", page);
@@ -58,8 +58,9 @@ public class ProductViewController {
         model.addAttribute("selectedBrandId", brandId);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("categories", categoryService.getAllCategories());
-        model.addAttribute("banners",bannerService.getActiveBanners());
+        model.addAttribute("banners", bannerService.getActiveBanners());
         model.addAttribute("brands", brandService.getAll());
+
         if (userDetails != null) {
             String userId = getUserId(userDetails);
             List<String> wishlistIds = wishlistService.getWishlist(userId)
@@ -90,13 +91,13 @@ public class ProductViewController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable String id, Model model) {
+    public String showEditForm(@PathVariable("id") String id, Model model) {
         model.addAttribute("product", productService.getProduct(id));
         return "edit-product";
     }
 
     @PostMapping("/edit/{id}")
-    public String updateProduct(@PathVariable String id,
+    public String updateProduct(@PathVariable("id") String id,
                                 @Valid @ModelAttribute ProductRequest request,
                                 BindingResult result) {
         if (result.hasErrors()) return "edit-product";
@@ -105,13 +106,13 @@ public class ProductViewController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable String id) {
+    public String deleteProduct(@PathVariable("id") String id) {
         productService.deleteProduct(id);
         return "redirect:/store/products";
     }
 
     @GetMapping("/products/{id}")
-    public String productDetail(@PathVariable String id, Model model,
+    public String productDetail(@PathVariable("id") String id, Model model,
                                 @AuthenticationPrincipal UserDetails userDetails) {
         model.addAttribute("product", productService.getProduct(id));
         model.addAttribute("reviews", reviewService.getReviewsByProductId(id));
