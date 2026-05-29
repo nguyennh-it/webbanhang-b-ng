@@ -22,8 +22,6 @@
             height: 250px;
             object-fit: cover;
         }
-
-        /* ===== CSS BANNER SLIDER ===== */
         .banner-carousel-inner {
             border-radius: 12px;
             overflow: hidden;
@@ -40,7 +38,6 @@
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
         }
-        /* ===== NÚT TIM ===== */
         .btn-wishlist {
             position: absolute;
             top: 10px;
@@ -63,8 +60,6 @@
             background: #ffe0e0;
             transform: scale(1.15);
         }
-
-        /* ===== TOAST ===== */
         #wishlistToast {
             display: none;
             position: fixed;
@@ -78,17 +73,8 @@
             z-index: 9999;
             box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
-        /* ===== RESPONSIVE CHO BANNER (MOBILE & TABLET) ===== */
-        @media (max-width: 992px) {
-            .banner-img {
-                height: 400px;
-            }
-        }
-        @media (max-width: 768px) {
-            .banner-img {
-                height: 280px;
-            }
-        }
+        @media (max-width: 992px) { .banner-img { height: 400px; } }
+        @media (max-width: 768px) { .banner-img { height: 280px; } }
     </style>
 </head>
 <body class="bg-light">
@@ -117,7 +103,6 @@
                 </a>
             </div>
         </div>
-
         <button class="carousel-control-prev" type="button" data-bs-target="#sportStoreCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Previous</span>
@@ -133,19 +118,26 @@
 
         <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
 
-            <a th:href="@{/store/products(brandId=${selectedBrandId}, keyword=${keyword})}"
+            <!-- Trang chủ: reset cả brandId và categoryId -->
+            <a th:href="@{/store/products(keyword=${keyword})}"
                class="btn px-3 py-2 border shadow-sm"
-               th:classappend="${selectedCategoryId == null} ? 'btn-dark text-white' : 'btn-light text-dark'"
+               th:classappend="${selectedCategoryId == null and selectedBrandId == null} ? 'btn-dark text-white' : 'btn-light text-dark'"
                style="border-radius: 6px;">Trang chủ</a>
 
-            <a th:href="@{/store/products(categoryId=1, brandId=${selectedBrandId}, keyword=${keyword})}"
-               class="btn px-3 py-2 border shadow-sm btn-light text-dark" style="border-radius: 6px;">Áo bóng đá</a>
+            <a th:href="@{/store/products(categoryId=1, keyword=${keyword})}"
+               class="btn px-3 py-2 border shadow-sm"
+               th:classappend="${selectedCategoryId == 1} ? 'btn-dark text-white' : 'btn-light text-dark'"
+               style="border-radius: 6px;">Áo bóng đá</a>
 
-            <a th:href="@{/store/products(categoryId=2, brandId=${selectedBrandId}, keyword=${keyword})}"
-               class="btn px-3 py-2 border shadow-sm btn-light text-dark" style="border-radius: 6px;">Giày bóng đá</a>
+            <a th:href="@{/store/products(categoryId=2, keyword=${keyword})}"
+               class="btn px-3 py-2 border shadow-sm"
+               th:classappend="${selectedCategoryId == 2} ? 'btn-dark text-white' : 'btn-light text-dark'"
+               style="border-radius: 6px;">Giày bóng đá</a>
 
-            <a th:href="@{/store/products(categoryId=3, brandId=${selectedBrandId}, keyword=${keyword})}"
-               class="btn px-3 py-2 border shadow-sm btn-light text-dark" style="border-radius: 6px;">Phụ kiện</a>
+            <a th:href="@{/store/products(categoryId=3, keyword=${keyword})}"
+               class="btn px-3 py-2 border shadow-sm"
+               th:classappend="${selectedCategoryId == 3} ? 'btn-dark text-white' : 'btn-light text-dark'"
+               style="border-radius: 6px;">Phụ kiện</a>
 
             <!-- DROPDOWN THƯƠNG HIỆU -->
             <div class="dropdown">
@@ -167,7 +159,7 @@
                     <li><hr class="dropdown-divider"></li>
                     <li th:each="brand : ${brands}">
                         <a class="dropdown-item"
-                           th:href="@{/store/products(brandId=${brand.id}, categoryId=${selectedCategoryId}, keyword=${keyword})}"
+                           th:href="@{/store/products(brandId=${brand.id}, keyword=${keyword})}"
                            th:classappend="${selectedBrandId == brand.id} ? 'fw-bold bg-light' : ''"
                            th:text="${brand.name}">Nike</a>
                     </li>

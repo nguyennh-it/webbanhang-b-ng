@@ -46,14 +46,16 @@ public class ProductViewController {
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "categoryId", required = false) Long categoryId,
+            @RequestParam(name = "brandId", required = false) Long brandId,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         int pageSize = 6;
-        var pageData = productService.getProducts(page, pageSize, keyword, categoryId,null);         // đóng goi
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId,brandId);         // đóng goi
         model.addAttribute("products", pageData.getContent());
         model.addAttribute("totalPages", pageData.getTotalPages());
         model.addAttribute("currentPage", page);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedBrandId", brandId);
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("banners",bannerService.getActiveBanners());
