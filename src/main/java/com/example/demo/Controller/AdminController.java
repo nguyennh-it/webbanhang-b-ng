@@ -20,7 +20,7 @@ public class AdminController {
 
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
-        model.addAttribute("totalProducts", productService.getProducts(0, 1000, null, null).getTotalElements());
+        model.addAttribute("totalProducts", productService.getProducts(0, 1000, null, null,null).getTotalElements());
         model.addAttribute("totalOrders", orderService.getAllOrders().size());
         model.addAttribute("totalCategories", categoryService.getAllCategories().size());
         return "admin/dashboard";
@@ -28,7 +28,7 @@ public class AdminController {
 
     @GetMapping("/product")
     public String products(Model model) {
-        model.addAttribute("products", productService.getProducts(0, 1000, null, null).getContent());
+        model.addAttribute("products", productService.getProducts(0, 1000, null, null,null).getContent());
         return "admin/products";
     }
 

@@ -31,4 +31,6 @@ public class Brand {
 
     @Column(length = 20)
     String status = "ACTIVE"; // Trạng thái hoạt động mặc định: ACTIVE / INACTIVE
+
+
 }

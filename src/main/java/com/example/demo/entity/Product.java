@@ -8,7 +8,8 @@ import jakarta.persistence.Id;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,4 +32,7 @@ public class Product {
 
     Long categoryId;
     Long productVariantId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    Brand brand;
 }

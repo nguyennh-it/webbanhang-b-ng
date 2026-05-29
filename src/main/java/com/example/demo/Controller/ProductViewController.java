@@ -4,13 +4,9 @@ import com.example.demo.dto.request.ProductRequest;
 import com.example.demo.dto.request.ReviewRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.CategoryService;
-import com.example.demo.service.ProductService;
-import com.example.demo.service.ReviewService;
-import com.example.demo.service.WishlistService;
+import com.example.demo.service.*;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
-import com.example.demo.service.BannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +32,7 @@ public class ProductViewController {
     WishlistService wishlistService;
     UserRepository userRepository;
     BannerService bannerService;
+    BrandService brandService;
     // Helper lấy userId từ username
     private String getUserId(UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -52,7 +49,7 @@ public class ProductViewController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         int pageSize = 6;
-        var pageData = productService.getProducts(page, pageSize, keyword, categoryId);         // đóng goi
+        var pageData = productService.getProducts(page, pageSize, keyword, categoryId,null);         // đóng goi
         model.addAttribute("products", pageData.getContent());
         model.addAttribute("totalPages", pageData.getTotalPages());
         model.addAttribute("currentPage", page);
@@ -60,7 +57,7 @@ public class ProductViewController {
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("banners",bannerService.getActiveBanners());
-        // Lấy wishlistIds nếu đã đăng nhập
+        model.addAttribute("brands", brandService.getAll());
         if (userDetails != null) {
             String userId = getUserId(userDetails);
             List<String> wishlistIds = wishlistService.getWishlist(userId)

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm Thương Hiệu</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Thêm Thương Hiệu Mới</h4>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/brands/create}" th:object="${brand}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Tên Thương Hiệu:</label>
+                    <input type="text" th:field="*{name}" class="form-control" required placeholder="Ví dụ: Nike, Adidas...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Logo (URL):</label>
+                    <input type="text" th:field="*{logo}" class="form-control" placeholder="Nhập link ảnh logo...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Quốc gia:</label>
+                    <input type="text" th:field="*{country}" class="form-control" placeholder="Ví dụ: Mỹ, Nhật Bản...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mô tả:</label>
+                    <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" th:field="*{status}" value="ACTIVE" class="form-check-input" id="statusCheck">
+                    <label class="form-check-label" for="statusCheck">Kích hoạt</label>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">Lưu lại</button>
+                    <a th:href="@{/admin/brands}" class="btn btn-secondary">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

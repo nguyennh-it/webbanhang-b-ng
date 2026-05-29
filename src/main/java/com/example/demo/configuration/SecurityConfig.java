@@ -51,6 +51,7 @@ public class SecurityConfig {
                         // STORE + CART PUBLIC
                         .requestMatchers(
                                 "/store/products",
+                                "/products/store/products",
                                 "/store/products/**",
                                 "/cart",
                                 "/cart/",

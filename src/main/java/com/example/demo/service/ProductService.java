@@ -1,4 +1,5 @@
 package com.example.demo.service;
+
 import com.example.demo.repository.OrderDetailRepository;
 import com.example.demo.repository.ProductSizeRepository;
 import com.example.demo.repository.ReviewRepository;
@@ -19,16 +20,16 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Transactional
 public class ProductService {
+
     ProductRepository productRepository;
     ProductMapper productMapper;
-     ProductSizeRepository productSizeRepository;
-     ReviewRepository reviewRepository;
+    ProductSizeRepository productSizeRepository;
+    ReviewRepository reviewRepository;
     OrderDetailRepository orderDetailRepository;
 
     private ProductResponse toResponseWithRating(Product product) {
@@ -38,42 +39,34 @@ public class ProductService {
         response.setSoldCount(orderDetailRepository.countSoldByProductId(product.getId()));
         return response;
     }
-    public ProductResponse createProduct(ProductRequest request) {
 
+    public ProductResponse createProduct(ProductRequest request) {
         if (productRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.PRODUCT_EXISTED);
         }
 
-        // 1. map product
         Product product = productMapper.toProduct(request);
         Product savedProduct = productRepository.save(product);
 
-        // 2. TẠO SIZE
         if (request.getSizes() != null && !request.getSizes().isEmpty()) {
             for (String s : request.getSizes()) {
-
                 ProductSize size = new ProductSize();
                 size.setSize(s.trim());
                 size.setStock(request.getStock() > 0 ? request.getStock() : 10);
                 size.setProduct(savedProduct);
-
                 productSizeRepository.save(size);
             }
         }
-
-        // 3. trả response
         return toResponseWithRating(savedProduct);
     }
 
     public void deleteProduct(String id) {
-        // Xóa ProductSize trước để tránh fail do foreign key
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
 
         if (product.getSizes() != null) {
             product.getSizes().forEach(size -> productSizeRepository.delete(size));
         }
-
         productRepository.deleteById(id);
     }
 
@@ -84,26 +77,31 @@ public class ProductService {
 
         return toResponseWithRating(productRepository.save(product));
     }
+
     public ProductResponse getProduct(String id) {
         return productRepository.findById(id)
                 .map(this::toResponseWithRating)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_EXISTED));
     }
-    // Sửa lại để hỗ trợ phân trang và tìm kiếm gộp làm một
-    public Page<ProductResponse> getProducts(int page, int size, String keyword, Long categoryId) {
-        // 1. Tạo đối tượng Pageable (trang bắt đầu từ 0)
-        Pageable pageable = PageRequest.of(page, size);
 
+    // 🚀 HÀM TỔNG HỢP DUY NHẤT: Hỗ trợ phân trang, tìm kiếm, lọc Category và lọc Brand gộp làm một!
+    public Page<ProductResponse> getProducts(int page, int size, String keyword, Long categoryId, Long brandId) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Product> productPage;
 
-        // 2. Logic: Nếu có từ khóa thì tìm theo tên + phân trang, không thì lấy hết + phân trang
-        if (categoryId != null) {
+        // 2. Kiểm tra điều kiện ưu tiên lọc
+        if (brandId != null) {
+            // ƯU TIÊN 1: Lọc theo Brand trước nếu người dùng click chọn thương hiệu
+            productPage = productRepository.findByBrandId(brandId, pageable);
+        } else if (categoryId != null) {
+            // ƯU TIÊN 2: Lọc theo Danh mục
             if (keyword != null && !keyword.isEmpty()) {
                 productPage = productRepository.findByCategoryIdAndNameContainingIgnoreCase(categoryId, keyword, pageable);
             } else {
                 productPage = productRepository.findByCategoryId(categoryId, pageable);
             }
         } else {
+            // MẶC ĐỊNH: Tìm kiếm theo từ khóa hoặc lấy tất cả
             if (keyword != null && !keyword.isEmpty()) {
                 productPage = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
             } else {
@@ -111,7 +109,6 @@ public class ProductService {
             }
         }
 
-        // 3. Chuyển đổi từ Page<Entity> sang Page<ResponseDTO> bằng MapStruct
         return productPage.map(this::toResponseWithRating);
     }
 }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Thương Hiệu</title>
+    <th:block th:replace="~{fragments/layout :: header-css}"></th:block>
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">🏷️ Danh sách Thương Hiệu</h2>
+        <a href="/admin/brands/create" class="btn btn-primary">+ Thêm mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover bg-white shadow-sm">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Quốc gia</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="b : ${brand}">
+            <td th:text="${b.id}"></td>
+            <td th:text="${b.name}"></td>
+            <td th:text="${b.country}"></td>
+            <td th:text="${b.status}"></td>
+            <td>
+                <a th:href="@{/admin/brands/edit/{id}(id=${b.id})}" class="btn btn-sm btn-warning">Sửa</a>
+                <a th:href="@{/admin/brands/delete/{id}(id=${b.id})}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Xóa thương hiệu này?')">Xóa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
