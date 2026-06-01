@@ -64,6 +64,7 @@ public class SecurityConfig {
 
                         // ADMIN ONLY
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/orders/chi-tiet/**").permitAll()
                         .requestMatchers("/orders/**").hasRole("ADMIN")
                         .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**").hasRole("ADMIN")
 

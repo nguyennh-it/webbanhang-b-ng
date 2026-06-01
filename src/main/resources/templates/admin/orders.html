@@ -34,16 +34,16 @@
                         th:text="${order.totalPrice != null} ? ${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'N/A'">
                     </td>
                     <td>
-            <span class="badge"
-                  th:classappend="${order.status != null and order.status.name() == 'PENDING'} ? 'bg-warning' :
-                                 (${order.status != null and order.status.name() == 'COMPLETED'} ? 'bg-success' : 'bg-secondary')"
-                  th:text="${order.status != null ? order.status.name() : 'N/A'}">
-            </span>
+                        <span class="badge"
+                              th:classappend="${order.status != null and order.status.name() == 'PENDING'} ? 'bg-warning' :
+                                             (${order.status != null and order.status.name() == 'COMPLETED'} ? 'bg-success' : 'bg-secondary')"
+                              th:text="${order.status != null ? order.status.name() : 'N/A'}">
+                        </span>
                     </td>
                     <td th:text="${order.createdAt != null} ? ${#strings.substring(order.createdAt.toString(), 0, 16)} : 'N/A'"></td>
                     <td>
                         <a th:href="@{/orders/chi-tiet/{id}(id=${order.id})}"
-                           class="btn btn-sm btn-outline-primary">Xem</a>
+                           class="btn btn-sm btn-outline-info fw-bold">Chi tiết</a>
                     </td>
                 </tr>
                 </tbody>

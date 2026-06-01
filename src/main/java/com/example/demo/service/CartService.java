@@ -131,8 +131,6 @@ public class CartService {
                         "Size " + size.getSize() + " không đủ hàng"
                 );
             }
-            size.setStock(size.getStock() - item.getQuantity());
-            productSizeRepository.save(size);
 
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
@@ -172,8 +170,6 @@ public class CartService {
                         "Size " + size.getSize() + " không đủ hàng"
                 );
             }
-            size.setStock(size.getStock() - item.getQuantity());
-            productSizeRepository.save(size);
 
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
