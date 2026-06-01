@@ -11,8 +11,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-    String password;
-    String firstname;   // khớp với User entity
-    String lastname;    // khớp với User entity
+    String password;   // Để trống nếu không muốn đổi mật khẩu
+    String fullName;   // Dùng fullName để đồng bộ với Entity
+    String phone;      // Quan trọng cho việc giao hàng
+    String address;    // Quan trọng cho việc giao hàng
     LocalDate dob;
 }

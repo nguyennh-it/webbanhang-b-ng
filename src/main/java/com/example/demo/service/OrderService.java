@@ -72,6 +72,10 @@ public class OrderService {
         return orderRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public List<Order> getOrdersForUser(String username) {
+        return orderRepository.findAllByUserUsernameOrderByCreatedAtDesc(username);
+    }
+
     public Order getOrderById(String id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + id));

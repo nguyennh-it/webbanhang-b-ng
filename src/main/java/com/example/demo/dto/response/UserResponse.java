@@ -13,7 +13,12 @@ import java.time.LocalDate;
 public class UserResponse {
     String id;
     String username;       // khớp với User entity
+    String email;
+    String fullName;
     String firstname;
     String lastname;
     LocalDate dob;
+    String phone;
+    String address;
+    String role;
 }

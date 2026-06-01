@@ -65,8 +65,11 @@ public class SecurityConfig {
                         // ADMIN ONLY
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/orders/chi-tiet/**").permitAll()
-                        .requestMatchers("/orders/**").hasRole("ADMIN")
+                        .requestMatchers("/orders/*/status").hasRole("ADMIN")
+                        .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/store/add/**", "/store/edit/**", "/store/delete/**").hasRole("ADMIN")
+                        .requestMatchers("/profile/**").authenticated()
+                        .requestMatchers("/profile").authenticated()
 
                         // PHẢI ĐĂNG NHẬP
                         .requestMatchers("/wishlist/**").authenticated()

@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.Enum.OrderStatus;
 import com.example.demo.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ public class OrderController {
 
     // HIỂN THỊ DANH SÁCH
     @GetMapping
-    public String viewOrders(Model model) {
+    public String viewOrders(Model model, Authentication auth) {
+        if (auth == null) {
+            return "redirect:/login";
+        }
 
-        System.out.println("🔥 ORDER CONTROLLER IS CALLED");
-
-        model.addAttribute("orders", orderService.getAllOrders());  //gọi xuống servie lấy toàn bộ ds
-
+        model.addAttribute("orders", orderService.getOrdersForUser(auth.getName()));
         return "orders";
     }
 
