@@ -26,10 +26,10 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    @GetMapping("/product")
+    @GetMapping("/products")
     public String products(Model model) {
         model.addAttribute("products", productService.getProducts(0, 1000, null, null,null).getContent());
-        return "admin/products";
+        return "admin/product-list";
     }
 
     @GetMapping("/orders")
