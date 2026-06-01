@@ -3,12 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.entity.CartItem;
 import com.example.demo.service.CartService;
 import com.example.demo.service.VoucherService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
                                                     //Giỏ Hàng
 @Controller
@@ -18,13 +20,16 @@ public class CartController {
     private final CartService cartService;
     private final VoucherService voucherService;
     @GetMapping({"","/", "/view"})
-    public String viewCart(Model model, Authentication auth) {
+    public String viewCart(Model model, Authentication auth, HttpSession session) {
 
         List<CartItem> cartItems;
         if (auth != null) {
             cartItems = cartService.getCartItems(auth.getName());
         } else {
-            cartItems = java.util.Collections.emptyList(); // Giỏ trống nếu chưa login
+            cartItems = (List<CartItem>) session.getAttribute("anonymousCart");
+            if (cartItems == null) {
+                cartItems = new ArrayList<>();
+            }
         }
 
         // Tính tổng tiền của cả giỏ hàng
@@ -43,20 +48,62 @@ public class CartController {
             @PathVariable String id,
             @RequestParam String sizeId,
             @RequestParam(name = "quantity", defaultValue = "1") int quantity,
-            Authentication auth
+            Authentication auth,
+            HttpSession session
     ) {
 
-        if (auth == null) return "redirect:/login";
-
         try {
+            if (auth == null) {
+                // Lưu tạm giỏ hàng vào session cho khách chưa đăng nhập
+                List<CartItem> anonymousCart = (List<CartItem>) session.getAttribute("anonymousCart");
+                if (anonymousCart == null) {
+                    anonymousCart = new ArrayList<>();
+                }
+
+                var product = cartService.getProductById(id);
+                var productSize = cartService.getProductSizeById(sizeId);
+
+                if (productSize.getStock() <= 0) {
+                    throw new RuntimeException("Sản phẩm này hiện đã hết hàng!");
+                }
+
+                CartItem existingItem = anonymousCart.stream()
+                        .filter(item -> item.getProduct().getId().equals(id)
+                                && item.getProductSize().getId().equals(sizeId))
+                        .findFirst()
+                        .orElse(null);
+
+                int currentInCart = (existingItem != null) ? existingItem.getQuantity() : 0;
+                int totalRequested = currentInCart + quantity;
+
+                if (productSize.getStock() < totalRequested) {
+                    if (currentInCart > 0) {
+                        throw new RuntimeException("Kho không đủ hàng! Bạn đã có " + currentInCart
+                                + " sản phẩm trong giỏ, kho chỉ còn " + productSize.getStock() + " sản phẩm.");
+                    } else {
+                        throw new RuntimeException("Kho không đủ hàng! Bạn chỉ có thể mua tối đa " + productSize.getStock() + " sản phẩm.");
+                    }
+                }
+
+                if (existingItem != null) {
+                    existingItem.setQuantity(totalRequested);
+                } else {
+                    anonymousCart.add(CartItem.builder()
+                            .id(java.util.UUID.randomUUID().toString())
+                            .product(product)
+                            .productSize(productSize)
+                            .quantity(quantity)
+                            .build());
+                }
+
+                session.setAttribute("anonymousCart", anonymousCart);
+                return "redirect:/cart";
+            }
+
             // Gọi service để kiểm tra logic tồn kho và thêm vào giỏ
             cartService.addToCart(id, sizeId, auth.getName(), quantity);
-
-            // Nếu thành công, chuyển hướng thẳng về trang xem giỏ hàng công thức cũ
             return "redirect:/cart";
         } catch (Exception e) {
-            // Nếu bắn ra RuntimeException (Hết hàng / Vượt quá tồn kho):
-            // Quay ngược về trang chi tiết sản phẩm hiện tại kèm thông điệp lỗi được mã hóa tiếng Việt đưa lên URL
             return "redirect:/store/products/" + id + "?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
         }
     }
@@ -66,8 +113,16 @@ public class CartController {
         return "redirect:/store/products";
     }
     @PostMapping("/remove/{id}")
-    public String removeFromCart(@PathVariable("id") String id) {
-        cartService.removeFromCart(id);
+    public String removeFromCart(@PathVariable("id") String id, Authentication auth, HttpSession session) {
+        if (auth == null) {
+            List<CartItem> anonymousCart = (List<CartItem>) session.getAttribute("anonymousCart");
+            if (anonymousCart != null) {
+                anonymousCart.removeIf(item -> id.equals(item.getId()));
+                session.setAttribute("anonymousCart", anonymousCart);
+            }
+        } else {
+            cartService.removeFromCart(id);
+        }
         return "redirect:/cart";
     }
     @PostMapping("/checkout")
@@ -75,25 +130,29 @@ public class CartController {
         if (auth == null) return "redirect:/login";
 
         try {
-                                                                // 1. Gọi service xử lý lưu đơn hàng và xóa giỏ rác cũ
+            // 1. Gọi service xử lý lưu đơn hàng và xóa giỏ rác cũ
             cartService.checkout(auth.getName());
 
-                                                                // 2. TỰ ĐỘNG CHUYỂN HƯỚNG: Thanh toán thành công, nhảy thẳng sang trang đơn hàng
+            // 2. TỰ ĐỘNG CHUYỂN HƯỚNG: Thanh toán thành công, nhảy thẳng sang trang đơn hàng
             return "redirect:/orders";
         } catch (Exception e) {
             // Nếu có lỗi phát sinh (hết hàng, lỗi DB...), quay về giỏ kèm tin nhắn lỗi
             return "redirect:/cart?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
         }
     }
+
     @GetMapping("/order")
-    public  String showOrderForm(Authentication auth, Model model) {
-        if (auth == null) return "redirect:/login";
+    public String showOrderForm(Authentication auth, Model model, HttpSession session) {
+        List<CartItem> cartItems;
+        if (auth != null) {
+            cartItems = cartService.getCartItems(auth.getName());
+        } else {
+            cartItems = (List<CartItem>) session.getAttribute("anonymousCart");
+            if (cartItems == null) {
+                cartItems = new ArrayList<>();
+            }
+        }
 
-        // 1. Lấy thông tin giỏ hàng hiện tại để hiển thị lại ở form thanh toán
-        List<CartItem> cartItems = cartService.getCartItems(auth.getName());
-        model.addAttribute("items", cartItems);
-
-        // 2. Tính tổng tiền để hiển thị ở form thanh toán
         double total = cartItems.stream()
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum();
@@ -101,36 +160,50 @@ public class CartController {
         model.addAttribute("items", cartItems);
         model.addAttribute("totalPrice", total);
 
-        // 3. Trả về trang giao diện order-form.html
         return "order-form";
     }
-                                                        @PostMapping("/order")
-                                                        public String submitOrder(
-                                                                @RequestParam String fullName,
-                                                                @RequestParam String phone,
-                                                                @RequestParam String address,
-                                                                @RequestParam String city,
-                                                                @RequestParam(required = false) String voucherCode,
-                                                                @RequestParam(required = false) Double finalAmount,
-                                                                Authentication auth) {
-                                                            if (auth == null) return "redirect:/login";
 
-                                                            String orderId = cartService.checkout(auth.getName());
+    @PostMapping("/order")
+    public String submitOrder(
+            @RequestParam String fullName,
+            @RequestParam String phone,
+            @RequestParam String address,
+            @RequestParam String city,
+            @RequestParam(required = false) String voucherCode,
+            @RequestParam(required = false) Double finalAmount,
+            Authentication auth,
+            HttpSession session) {
 
-                                                            // Trừ quantity voucher nếu có dùng
-                                                            if (voucherCode != null && !voucherCode.isEmpty()) {
-                                                                voucherService.consumeVoucher(voucherCode);
-                                                            }
+        try {
+            String orderId;
+            if (auth != null) {
+                orderId = cartService.checkout(auth.getName());
+            } else {
+                List<CartItem> anonymousCart = (List<CartItem>) session.getAttribute("anonymousCart");
+                if (anonymousCart == null || anonymousCart.isEmpty()) {
+                    return "redirect:/cart?error=" + java.net.URLEncoder.encode("Giỏ hàng đang trống", java.nio.charset.StandardCharsets.UTF_8);
+                }
+                String fullAddress = address + ", " + city;
+                orderId = cartService.checkoutAnonymous(anonymousCart, fullAddress);
+                session.removeAttribute("anonymousCart");
+            }
 
-                                                            // Truyền finalAmount sang trang thanh toán
-                                                            String redirectUrl = "redirect:/payment?orderId=" + orderId;
-                                                            if (finalAmount != null) {
-                                                                redirectUrl += "&finalAmount=" + finalAmount.longValue();
-                                                            }
-                                                            return redirectUrl;
+            if (voucherCode != null && !voucherCode.isEmpty()) {
+                voucherService.consumeVoucher(voucherCode);
+            }
+
+            String redirectUrl = "redirect:/payment?orderId=" + orderId;
+            if (finalAmount != null) {
+                redirectUrl += "&finalAmount=" + finalAmount.longValue();
+            }
+            return redirectUrl;
+        } catch (Exception e) {
+            return "redirect:/cart?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
-        @GetMapping("/thank-you")
-        public String thankYou() {
+
+    @GetMapping("/thank-you")
+    public String thankYou() {
         return "thank-you";
     }
 

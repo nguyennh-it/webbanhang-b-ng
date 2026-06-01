@@ -57,11 +57,10 @@
                     0
                 </td>
                 <td class="text-center">
-                    <form th:if="${isLoggedIn}" method="post" onsubmit="return confirm('Bạn  chắc chắn muốn bỏ món này chứ?')"
+                    <form method="post" onsubmit="return confirm('Bạn chắc chắn muốn bỏ món này chứ?')"
                           th:action="@{/cart/remove/{id}(id=${item.id})}">
                         <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
                     </form>
-                    <span th:if="${!isLoggedIn}" class="text-muted small">Đăng nhập để xóa</span>
                 </td>
             </tr>
             </tbody>
@@ -72,12 +71,9 @@
                                        th:text="${totalPrice != null ? #numbers.formatDecimal(totalPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}">0 VNĐ</span>
             </h4>
             <a class="btn btn-outline-secondary" href="/store/products">Quay lại mua sắm</a>
-            <a th:if="${isLoggedIn}" th:href="@{/cart/order}"
+            <a th:href="@{/cart/order}"
                class="btn btn-success px-4 ms-2">
                 Đặt hàng
-            </a>
-            <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-success px-4 ms-2">
-                Đăng nhập để thanh toán
             </a>
         </div>
     </div>

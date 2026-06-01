@@ -32,9 +32,7 @@ public class CartService {
                 .orElseThrow(() ->
                         new RuntimeException("Không tìm thấy người dùng"));
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() ->
-                        new RuntimeException("Sản phẩm không tồn tại"));
+        Product product = getProductById(productId);
 
         ProductSize productSize = productSizeRepository.findById(sizeId)
                 .orElseThrow(() ->
@@ -96,6 +94,56 @@ public class CartService {
 
     public List<CartItem> getCartItems(String username) {
         return cartItemRepository.findByUserUsername(username);
+    }
+
+    public Product getProductById(String id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+    }
+
+    public ProductSize getProductSizeById(String id) {
+        return productSizeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Size không tồn tại"));
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public String checkoutAnonymous(List<CartItem> cartItems, String address) {
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new RuntimeException("Giỏ hàng đang trống, không thể thanh toán!");
+        }
+
+        com.example.demo.entity.Order order = new com.example.demo.entity.Order();
+        order.setId(java.util.UUID.randomUUID().toString());
+        order.setUser(null);
+        order.setAddress(address);
+        order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+        order.setStatus(OrderStatus.PENDING);
+        double total = cartItems.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
+        order.setTotalPrice(total);
+        orderRepository.save(order);
+
+        for (CartItem item : cartItems) {
+            ProductSize size = item.getProductSize();
+            if (size.getStock() < item.getQuantity()) {
+                throw new RuntimeException(
+                        "Size " + size.getSize() + " không đủ hàng"
+                );
+            }
+            size.setStock(size.getStock() - item.getQuantity());
+            productSizeRepository.save(size);
+
+            OrderDetail detail = new OrderDetail();
+            detail.setOrder(order);
+            detail.setProduct(item.getProduct());
+            detail.setProductSize(size);
+            detail.setQuantity(item.getQuantity());
+            detail.setPrice(item.getProduct().getPrice());
+            orderDetailRepository.save(detail);
+        }
+
+        return order.getId();
     }
 
     @org.springframework.transaction.annotation.Transactional
