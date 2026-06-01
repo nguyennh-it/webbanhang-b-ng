@@ -37,6 +37,7 @@ public class AdminController {
     @GetMapping("/orders")
     public String orders(Model model) {
         model.addAttribute("orders", orderService.getAllOrders());
+        model.addAttribute("orderStatuses", OrderStatus.values());
         return "admin/orders"; //
     }
 

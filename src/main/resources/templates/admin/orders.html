@@ -13,6 +13,11 @@
         <a href="/admin/dashboard" class="btn btn-outline-secondary">← Dashboard</a>
     </div>
 
+    <div class="mb-3">
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -34,11 +39,16 @@
                         th:text="${order.totalPrice != null} ? ${#numbers.formatDecimal(order.totalPrice, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' : 'N/A'">
                     </td>
                     <td>
-                        <span class="badge"
-                              th:classappend="${order.status != null and order.status.name() == 'PENDING'} ? 'bg-warning' :
-                                             (${order.status != null and order.status.name() == 'COMPLETED'} ? 'bg-success' : 'bg-secondary')"
-                              th:text="${order.status != null ? order.status.name() : 'N/A'}">
-                        </span>
+                        <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post" class="d-flex gap-2 align-items-center">
+                            <select name="status" class="form-select form-select-sm" style="min-width: 140px;">
+                                <option th:each="status : ${orderStatuses}"
+                                        th:value="${status}"
+                                        th:selected="${status} == ${order.status}"
+                                        th:text="${status.name()}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
+                        </form>
                     </td>
                     <td th:text="${order.createdAt != null} ? ${#strings.substring(order.createdAt.toString(), 0, 16)} : 'N/A'"></td>
                     <td>
