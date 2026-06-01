@@ -10,7 +10,6 @@
 <div class="container mt-5">
   <div class="row g-5">
 
-    <!-- Ảnh sản phẩm -->
     <div class="col-md-6">
       <img th:src="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}
                          ? ${product.imageUrl}
@@ -20,9 +19,13 @@
            alt="Ảnh sản phẩm">
     </div>
 
-    <!-- Thông tin sản phẩm -->
     <div class="col-md-6">
       <h2 class="fw-bold" th:text="${product.name}">Tên sản phẩm</h2>
+
+      <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show fw-bold mt-2" role="alert">
+        ❌ <span th:text="${param.error}">Thông báo lỗi hết hàng</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
 
       <p class="text-muted mt-2"
          th:text="${product.description != null ? product.description : 'Chưa có mô tả.'}">
@@ -36,27 +39,32 @@
         0 VNĐ
       </h3>
 
-      <!-- Form thêm vào giỏ -->
       <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" class="mt-4">
-        <select name="sizeId" required class="form-select mb-3">
-            <option value="" selected disabled>-- Vui lòng chọn Size --</option>
+        <select name="sizeId" id="sizeSelect" required class="form-select mb-3">
+          <option value="" selected disabled>-- Vui lòng chọn Size --</option>
           <option th:each="s : ${product.sizes}"
                   th:value="${s.id}"
                   th:text="${s.size + ' - Còn ' + s.stock}">
           </option>
         </select>
-        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+        <div class="mb-4">
+          <label for="quantity" class="form-label fw-bold">Số lượng:</label>
+          <div class="input-group" style="max-width: 140px;">
+            <button class="btn btn-outline-secondary" type="button" onclick="changeQty(-1)">-</button>
+            <input type="number" id="quantity" name="quantity" class="form-control text-center fw-bold" value="1" min="1" max="99" required>
+            <button class="btn btn-outline-secondary" type="button" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <button type="submit" id="addToCartBtn" class="btn btn-primary w-100 fw-bold py-2">
           Thêm vào giỏ 🛒
         </button>
       </form>
 
-      <!-- Quay lại -->
       <a href="/store/products" class="btn btn-outline-secondary mt-3">
         ← Quay lại danh sách
       </a>
     </div>
   </div>
-  <!-- PHẦN REVIEW -->
   <div class="row mt-5">
     <div class="col-12">
       <hr/>
@@ -64,10 +72,8 @@
         <span class="text-muted fs-6">(<span th:text="${#lists.size(reviews)}">0</span> đánh giá)</span>
       </h4>
 
-      <!-- Không có review -->
       <p th:if="${#lists.isEmpty(reviews)}" class="text-muted">Chưa có đánh giá nào.</p>
 
-      <!-- Danh sách review -->
       <div th:each="review : ${reviews}" class="border-bottom pb-3 mb-3">
         <div class="d-flex justify-content-between">
           <strong th:text="${review.reviewerName}">Tên</strong>
@@ -80,7 +86,6 @@
         <p class="mt-1 mb-0" th:text="${review.comment}"></p>
       </div>
 
-      <!-- Form viết review -->
       <div class="mt-4">
         <h5 class="fw-bold">Viết đánh giá</h5>
         <form th:action="@{/store/products/{id}/reviews(id=${product.id})}"
@@ -114,6 +119,16 @@
 </div>
 
 <script>
+  function changeQty(amount) {
+    const qtyInput = document.getElementById('quantity');
+    let currentQty = parseInt(qtyInput.value) || 1;
+    currentQty += amount;
+
+    if (currentQty < 1) currentQty = 1;
+    if (currentQty > 99) currentQty = 99; // Giới hạn mua tối đa 99 sản phẩm
+
+    qtyInput.value = currentQty;
+  }
   document.querySelectorAll('.star-btn').forEach(star => {
     star.addEventListener('mouseover', function () {
       const val = this.dataset.value;
@@ -131,6 +146,27 @@
       s.style.color = selected && s.dataset.value <= selected ? '#f5a623' : '#ddd';
     });
   });
+
+  // 🔥 ĐÃ BỔ SUNG: Logic JavaScript kiểm tra text của Option để khóa nút mua hàng ngay lập tức
+  const sizeSelect = document.getElementById('sizeSelect');
+  const addToCartBtn = document.getElementById('addToCartBtn');
+
+  if(sizeSelect && addToCartBtn) {
+    sizeSelect.addEventListener('change', function() {
+      const selectedText = this.options[this.selectedIndex].text;
+
+      // Nếu chuỗi chứa "Còn 0" thì mờ nút và chuyển sang màu đỏ báo Hết hàng
+      if (selectedText.includes("Còn 0")) {
+        addToCartBtn.disabled = true;
+        addToCartBtn.innerText = "Đã Hết";
+        addToCartBtn.className = "btn btn-danger w-100 fw-bold py-2";
+      } else {
+        addToCartBtn.disabled = false;
+        addToCartBtn.innerText = "Thêm vào giỏ 🛒";
+        addToCartBtn.className = "btn btn-primary w-100 fw-bold py-2";
+      }
+    });
+  }
 </script>
 
 <div th:replace="~{fragments/layout :: footer}"></div>

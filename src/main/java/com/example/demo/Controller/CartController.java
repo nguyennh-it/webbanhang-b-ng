@@ -42,14 +42,23 @@ public class CartController {
     public String addToCart(
             @PathVariable String id,
             @RequestParam String sizeId,
+            @RequestParam(name = "quantity", defaultValue = "1") int quantity,
             Authentication auth
     ) {
 
         if (auth == null) return "redirect:/login";
 
-        cartService.addToCart(id, sizeId, auth.getName());
+        try {
+            // Gọi service để kiểm tra logic tồn kho và thêm vào giỏ
+            cartService.addToCart(id, sizeId, auth.getName(), quantity);
 
-        return "redirect:/cart";
+            // Nếu thành công, chuyển hướng thẳng về trang xem giỏ hàng công thức cũ
+            return "redirect:/cart";
+        } catch (Exception e) {
+            // Nếu bắn ra RuntimeException (Hết hàng / Vượt quá tồn kho):
+            // Quay ngược về trang chi tiết sản phẩm hiện tại kèm thông điệp lỗi được mã hóa tiếng Việt đưa lên URL
+            return "redirect:/store/products/" + id + "?error=" + java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
 
     @PostMapping("/add")
@@ -124,4 +133,5 @@ public class CartController {
         public String thankYou() {
         return "thank-you";
     }
+
 }

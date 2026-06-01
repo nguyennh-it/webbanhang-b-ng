@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+                                                    //Dùng Spring Core (Dependency Injection),Spring Core (Bean),Data Access (JPA)
 @Service
 @RequiredArgsConstructor
 public class BrandService {

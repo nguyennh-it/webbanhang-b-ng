@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+//Dùng @Transactional ,Xử lý DB nâng cao (Spring Data JPA), (Java Stream API),Logic Nghiệp vụ (Business Validation)
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -20,14 +21,14 @@ public class CartService {
     private final OrderDetailRepository orderDetailRepository;
     private final ProductSizeRepository productSizeRepository;
 
-
     public void addToCart(
             String productId,
             String sizeId,
-            String username
+            String username,
+            int quantity
     ) {
 
-        User user = userRepository.findByUsername(username)             //tìm trong giỏ hàng
+        User user = userRepository.findByUsername(username) //tìm trong giỏ hàng
                 .orElseThrow(() ->
                         new RuntimeException("Không tìm thấy người dùng"));
 
@@ -39,6 +40,12 @@ public class CartService {
                 .orElseThrow(() ->
                         new RuntimeException("Size không tồn tại"));
 
+        // 1. CHẶN NGAY: Nếu kho đã hết sạch hàng (bằng 0 hoặc âm)
+        if (productSize.getStock() <= 0) {
+            throw new RuntimeException("Sản phẩm này hiện đã hết hàng!");
+        }
+
+        // 2. Tìm xem sản phẩm cùng size này đã có trong giỏ hàng của khách chưa
         CartItem existingItem =
                 cartItemRepository.findByUserAndProductAndProductSize(
                         user,
@@ -46,12 +53,24 @@ public class CartService {
                         productSize
                 );
 
+        // Tính toán tổng số lượng mà khách hàng muốn mua dồn
+        int currentInCart = (existingItem != null) ? existingItem.getQuantity() : 0;
+        int totalRequested = currentInCart + quantity;
+
+        // 3. CHẶN TIẾP: Nếu tổng số lượng định mua vượt quá số lượng còn lại trong kho
+        if (productSize.getStock() < totalRequested) {
+            if (currentInCart > 0) {
+                throw new RuntimeException("Kho không đủ hàng! Bạn đã có " + currentInCart
+                        + " sản phẩm trong giỏ, kho chỉ còn " + productSize.getStock() + " sản phẩm.");
+            } else {
+                throw new RuntimeException("Kho không đủ hàng! Bạn chỉ có thể mua tối đa " + productSize.getStock() + " sản phẩm.");
+            }
+        }
+
+        // 4. Nếu vượt qua các vòng check trên thì tiến hành lưu vào Database
         if (existingItem != null) {
 
-            existingItem.setQuantity(
-                    existingItem.getQuantity() + 1
-            );
-
+            existingItem.setQuantity(totalRequested);
             cartItemRepository.save(existingItem);
 
         } else {
@@ -63,7 +82,7 @@ public class CartService {
                     .user(user)
                     .product(product)
                     .productSize(productSize)
-                    .quantity(1)
+                    .quantity(quantity)
                     .cart(cart)
                     .build();
 
@@ -116,10 +135,8 @@ public class CartService {
             detail.setPrice(item.getProduct().getPrice());
             orderDetailRepository.save(detail);
         }
-// 🔥 QUAN TRỌNG NHẤT: xóa giỏ hàng
-        cartItemRepository.deleteByUserUsername(username);
+        // 🔥 QUAN TRỌNG NHẤT: xóa giỏ hàng
         cartItemRepository.deleteByUserUsername(username);
         return order.getId();
     }
-
 }
