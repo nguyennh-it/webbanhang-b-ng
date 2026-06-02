@@ -29,7 +29,14 @@ public class UserService {
         if (userRepository.existsByUsername(request.getUsername())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+        if (request.getEmail() != null && userRepository.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
         User user=userMapper.toUser(request);
+        // encode password and set default role
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("USER");
+
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
