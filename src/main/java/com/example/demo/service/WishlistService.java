@@ -24,8 +24,9 @@ public class WishlistService {
     UserRepository userRepository;
     ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public List<Wishlist> getWishlist(String userId) {
-        return wishlistRepository.findByUserId(userId);
+        return wishlistRepository.findByUserIdWithProduct(userId);
     }
 
     @Transactional

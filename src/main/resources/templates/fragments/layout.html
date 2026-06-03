@@ -79,6 +79,13 @@
                     <a href="/cart" class="btn btn-warning position-relative fw-bold shadow-sm">
                         🛒 Giỏ hàng
                     </a>
+                    <a sec:authorize="isAuthenticated()" th:href="@{/wishlist}"
+                       class="btn btn-outline-light btn-sm ms-2 position-relative">
+                        ❤️ Yêu thích
+                        <span th:if="${wishlistCount != null and wishlistCount > 0}"
+                              class="badge bg-danger rounded-pill ms-1"
+                              th:text="${wishlistCount}">0</span>
+                    </a>
                     <a sec:authorize="isAuthenticated()" href="/profile" class="btn btn-outline-light btn-sm">Hồ sơ </a>
                     <form sec:authorize="isAuthenticated()" action="/logout" method="post" style="display:inline">
                         <button type="submit" class="btn btn-outline-light btn-sm">Đăng xuất</button>

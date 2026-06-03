@@ -247,18 +247,23 @@
 <div id="wishlistToast"></div>
 
 <script>
-    const csrf = document.querySelector('meta[name="_csrf"]')?.content || '';
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content || '';
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
 
     function toggleWishlist(btn) {
         event.stopPropagation();
         const productId = btn.dataset.productId;
 
+        const headers = {};
+        headers[csrfHeader] = csrfToken;
+
         fetch('/wishlist/toggle/' + productId, {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrf }
+            headers: headers,
+            credentials: 'same-origin'
         })
             .then(r => {
-                if (r.status === 302 || r.redirected) {
+                if (r.status === 302 || r.redirected || r.status === 401 || r.status === 403) {
                     window.location.href = '/login';
                     return null;
                 }
