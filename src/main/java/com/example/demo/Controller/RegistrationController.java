@@ -19,13 +19,13 @@ public class RegistrationController {
 
     private final UserService userService;
 
-    @GetMapping("/register")
+    @GetMapping("/register")                                    // hiển thị form đăng ký
     public String showRegisterForm(Model model){
         model.addAttribute("user", new UserCreationRequest());
         return "register";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register")                       //kiểm tra người dùng
     public String registerUser(@ModelAttribute("user") @Valid UserCreationRequest request,
                                BindingResult bindingResult,
                                RedirectAttributes redirectAttributes){

@@ -26,3 +26,7 @@ spring:
             scope:
               - email
               - public_profile
+logging:
+  level:
+    com.example.demo: INFO
+    com.example.demo.service: DEBUG
